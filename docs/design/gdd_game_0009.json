@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "game_id": "game_0009",
+    "code_name": "MG-0009",
+    "title_kr": "영웅 수집 카드 퍼즐",
+    "title_en": "Hero Collection Card Puzzle",
+    "version": "0.1.0",
+    "last_updated": "2025-01-01"
+  },
+  "overview": {
+    "genre_tags": ["card", "collection", "puzzle"],
+    "target_audience": {
+      "age": "15-35",
+      "region": ["KR", "SEA"],
+      "play_style": "casual"
+    },
+    "core_loop": "영웅 카드를 수집하고, 퍼즐 전투로 적을 물리치며, 덱을 강화한다",
+    "unique_selling_point": "카드 수집과 퍼즐 전투의 조화"
+  },
+  "gameplay": {
+    "core_mechanics": [
+      {
+        "name": "카드 수집",
+        "description": "다양한 영웅 카드를 가챠를 통해 수집"
+      },
+      {
+        "name": "퍼즐 전투",
+        "description": "퍼즐을 풀어 카드 스킬을 발동"
+      },
+      {
+        "name": "덱 빌딩",
+        "description": "수집한 카드로 최적의 덱 구성"
+      }
+    ],
+    "progression": {
+      "type": "stage_and_collection",
+      "description": "스테이지 클리어와 카드 수집으로 진행"
+    },
+    "session_length": "5-10분"
+  },
+  "economy": {
+    "currencies": [
+      {
+        "name": "골드",
+        "type": "soft",
+        "sources": ["전투 승리", "퀘스트", "카드 판매"],
+        "sinks": ["카드 강화", "카드 진화", "상점 구매"]
+      },
+      {
+        "name": "보석",
+        "type": "hard",
+        "sources": ["인앱 구매", "업적", "이벤트"],
+        "sinks": ["카드 가챠", "에너지 충전", "골드 구매"]
+      },
+      {
+        "name": "에너지",
+        "type": "energy",
+        "max": 100,
+        "regen_rate": "1/5분",
+        "sources": ["시간 회복", "보석 구매", "광고"],
+        "sinks": ["스테이지 입장"]
+      }
+    ],
+    "monetization": {
+      "model": "F2P + IAP",
+      "iap_items": ["보석 패키지", "카드 팩", "월정액"],
+      "ad_placements": ["보상형 광고 (에너지, 카드 팩)", "인터스티셜 (스테이지 클리어 후)"]
+    }
+  },
+  "technical": {
+    "platform": ["Android", "iOS"],
+    "engine": "Flutter + Flame",
+    "backend": "Firebase",
+    "analytics": "GA4 + BigQuery"
+  }
+}
