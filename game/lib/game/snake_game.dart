@@ -498,12 +498,10 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
         final prev = snake[i - 1]; // Segment before tail
         final diff = prev - segment; // Vector from tail to prev
 
-        if (diff.x > 0)
+        if (diff.x > 0) {
           rotation =
               0; // Prev is right -> Tail points right (wait, tail should point away?)
-        // Usually sprites face Right. A tail sprite facing right means the tip is left and connection is right.
-        // So if connection is Right (diff.x > 0), rotation 0 is correct.
-        else if (diff.x < 0)
+        } else if (diff.x < 0)
           rotation = 3.14159;
         else if (diff.y > 0)
           rotation = 1.5708;
@@ -525,10 +523,11 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
           // Corner - Simplified to Straight for now to avoid logic complexity
           // Or better: just pick straight based on prev-current relation
           final diff = prev - segment;
-          if (diff.x != 0)
+          if (diff.x != 0) {
             rotation = 0;
-          else
+          } else {
             rotation = 1.5708;
+          }
         }
       }
 
