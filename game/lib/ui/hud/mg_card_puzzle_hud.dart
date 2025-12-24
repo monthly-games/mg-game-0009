@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:mg_common_game/core/ui/mg_ui.dart';
 
 /// MG UI 기반 Card Puzzle 게임 HUD
-/// mg_common_game의 공통 UI 컴포넌트 활용
+/// mg_common_game??공통 UI 컴포?�트 ?�용
 class MGCardPuzzleHud extends StatelessWidget {
   final int score;
   final int highScore;
   final int length;
   final int coins;
-  final int? timeRemaining; // 타임어택 모드용
-  final bool isPaused;
+  final int? timeRemaining; // ?�?�어??모드??  final bool isPaused;
   final VoidCallback? onPause;
   final VoidCallback? onResume;
 
-  const MGSnakeHud({
+  const MGCardPuzzleHud({
     super.key,
     required this.score,
     this.highScore = 0,
@@ -32,7 +31,7 @@ class MGCardPuzzleHud extends StatelessWidget {
     return Positioned.fill(
       child: Column(
         children: [
-          // 상단 HUD: 일시정지 + 점수 + 코인
+          // ?�단 HUD: ?�시?��? + ?�수 + 코인
           Container(
             padding: EdgeInsets.only(
               top: safeArea.top + MGSpacing.hudMargin,
@@ -42,7 +41,7 @@ class MGCardPuzzleHud extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 일시정지 버튼
+                // ?�시?��? 버튼
                 MGIconButton(
                   icon: isPaused ? Icons.play_arrow : Icons.pause,
                   onPressed: isPaused ? onResume : onPause,
@@ -51,10 +50,10 @@ class MGCardPuzzleHud extends StatelessWidget {
                   color: Colors.white,
                 ),
 
-                // 점수 표시
+                // ?�수 ?�시
                 _buildScoreDisplay(),
 
-                // 코인 표시
+                // 코인 ?�시
                 MGResourceBar(
                   icon: Icons.monetization_on,
                   value: _formatNumber(coins),
@@ -67,7 +66,7 @@ class MGCardPuzzleHud extends StatelessWidget {
 
           MGSpacing.vSm,
 
-          // 뱀 길이 + 타이머 표시
+          // 뱀 길이 + ?�?�머 ?�시
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: safeArea.left + MGSpacing.hudMargin,
@@ -84,10 +83,10 @@ class MGCardPuzzleHud extends StatelessWidget {
             ),
           ),
 
-          // 중앙 영역 확장 (게임 영역)
+          // 중앙 ?�역 ?�장 (게임 ?�역)
           const Expanded(child: SizedBox()),
 
-          // 하단: 최고 점수 (필요시)
+          // ?�단: 최고 ?�수 (?�요??
           if (highScore > 0)
             Container(
               padding: EdgeInsets.only(
