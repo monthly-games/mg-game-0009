@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../game/snake_game.dart';
 import 'tutorial_overlay.dart';
 import 'pause_overlay.dart';
-import 'hud/mg_snake_hud.dart';
+import 'hud/mg_card_puzzle_hud.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
 import '../utils/high_score_manager.dart';
 import 'package:mg_common_game/core/ui/screens/leaderboard_screen.dart';
@@ -657,13 +657,13 @@ class _GameScreenState extends State<GameScreen> {
         children: [
           GameWidget(game: _game),
 
-          // MG Snake HUD (게임오버 아닐 때만)
+          // MG Card Puzzle HUD (게임오버 아닐 때만)
           if (!_showTutorial && !_showPause && !_showGameOver)
             StreamBuilder<int>(
               stream: GetIt.I<GoldManager>().onGoldChanged,
               initialData: GetIt.I<GoldManager>().currentGold,
               builder: (context, snapshot) {
-                return MGSnakeHud(
+                return MGCardPuzzleHud(
                   score: _game.score,
                   highScore: _highScore,
                   length: _game.snake.length,

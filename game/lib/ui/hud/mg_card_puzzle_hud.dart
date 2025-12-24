@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mg_common_game/core/ui/mg_ui.dart';
 
-/// MG UI 기반 스네이크 게임 HUD
+/// MG UI 기반 Card Puzzle 게임 HUD
 /// mg_common_game의 공통 UI 컴포넌트 활용
-class MGSnakeHud extends StatelessWidget {
+class MGCardPuzzleHud extends StatelessWidget {
   final int score;
   final int highScore;
   final int length;
