@@ -87,7 +87,7 @@
 
 이 게임은 **mg_common_game** 디자인 시스템을 기반으로 한 표준화된 HUD를 사용합니다.
 
-**HUD 파일**: [game/lib/ui/hud/mg_snake_hud.dart](game/lib/ui/hud/mg_snake_hud.dart)
+**HUD 파일**: [game/lib/ui/hud/mg_card_puzzle_hud.dart](game/lib/ui/hud/mg_card_puzzle_hud.dart)
 
 ### 사용된 mg_common_game 컴포넌트
 
@@ -106,7 +106,7 @@ All-in-one import로 모든 MG UI 컴포넌트를 사용합니다:
 
 ### HUD 사용 가이드
 
-전체 HUD 컴포넌트 사용법은 [MG_HUD_COMPONENT_GUIDE.md](../../MG_HUD_COMPONENT_GUIDE.md)를 참고하세요.
+전체 HUD 컴포넌트 사용법은 [MG_HUD_COMPONENT_GUIDE.md](../mg-meta/MG_HUD_COMPONENT_GUIDE.md)를 참고하세요.
 
 ---
 
