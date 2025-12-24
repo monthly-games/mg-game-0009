@@ -1,7 +1,13 @@
-# 영웅 수집 카드 퍼즐 - BM 설계 문서
+﻿# 영웅 수집 카드 퍼즐 - BM 설계 문서
 
 > game_id: game_0009
 > repo: mg-game-0009
+> title_kr: 영웅 수집 카드 퍼즐
+> title_en: Hero Collection Card Puzzle
+> genre_tags: card, collection, puzzle
+> doc_type: bm_design
+> source_of_truth: docs/design/gdd_game_0009.json
+> last_updated: 2025-12-19
 
 ---
 
