@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 class GameOverOverlay extends StatefulWidget {
   final int score;
@@ -70,10 +71,10 @@ class _GameOverOverlayState extends State<GameOverOverlay>
           decoration: BoxDecoration(
             color: const Color(0xFF1a1a1a),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white24, width: 2),
+            border: Border.all(color: MGColors.textDisabled, width: 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
+                color: MGColors.backgroundDarkDark.withValues(alpha: 0.5),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -112,21 +113,21 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                   horizontal: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.2),
+                  color: MGColors.gold.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.amber.withValues(alpha: 0.5),
+                    color: MGColors.gold.withValues(alpha: 0.5),
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.monetization_on, color: Colors.amber),
+                    const Icon(Icons.monetization_on, color: MGColors.gold),
                     const SizedBox(width: 8),
                     Text(
                       '+$_goldEarned Gold',
                       style: const TextStyle(
-                        color: Colors.amber,
+                        color: MGColors.gold,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -144,13 +145,13 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                   _buildButton(
                     icon: Icons.home,
                     label: 'Menu',
-                    color: Colors.blueGrey,
+                    color: MGColors.surfaceDark,
                     onTap: widget.onMainMenu,
                   ),
                   _buildButton(
                     icon: Icons.refresh,
                     label: 'Retry',
-                    color: const Color(0xFF76c043),
+                    color: MGColors.success,
                     onTap: widget.onRestart,
                   ),
                 ],
@@ -173,7 +174,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
         Text(
           label,
           style: const TextStyle(
-            color: Colors.grey,
+            color: MGColors.common,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -185,13 +186,13 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
-                  color: Colors.amber,
+                  color: MGColors.gold,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text(
                   'NEW',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: MGColors.backgroundDarkDark,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),
@@ -200,7 +201,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
             Text(
               value,
               style: const TextStyle(
-                color: Colors.white,
+                color: MGColors.textHighEmphasis,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -237,12 +238,12 @@ class _GameOverOverlayState extends State<GameOverOverlay>
           ),
           child: Column(
             children: [
-              Icon(icon, color: Colors.white, size: 28),
+              Icon(icon, color: MGColors.textHighEmphasis, size: 28),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: MGColors.textHighEmphasis,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -2,6 +2,7 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:mg_common_game/core/engine/effects/flame_effects.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 class VfxManager extends Component {
   VfxManager();
@@ -21,7 +22,7 @@ class VfxManager extends Component {
     _addEffect(
       FlameParticleEffect.explosion(
           position: position.clone(),
-          color: Colors.red,
+          color: MGColors.error,
           radius: 25.0,
         ),
     );
@@ -32,7 +33,7 @@ class VfxManager extends Component {
     _addEffect(
       FlameParticleEffect.explosion(
           position: position.clone(),
-          color: Colors.amber,
+          color: MGColors.gold,
           radius: 30.0,
         ),
     );
@@ -43,7 +44,7 @@ class VfxManager extends Component {
     _addEffect(
       FlameParticleEffect.explosion(
           position: position.clone(),
-          color: Colors.green,
+          color: MGColors.success,
           radius: 20.0,
         ),
     );
@@ -54,7 +55,7 @@ class VfxManager extends Component {
     _addEffect(
       FlameParticleEffect.explosion(
           position: position.clone(),
-          color: Colors.red,
+          color: MGColors.error,
           radius: 40.0,
         ),
     );
@@ -65,7 +66,7 @@ class VfxManager extends Component {
     _addEffect(
       FlameParticleEffect.explosion(
           position: position.clone(),
-          color: Colors.orange,
+          color: MGColors.warning,
           radius: 35.0,
         ),
     );
@@ -76,7 +77,7 @@ class VfxManager extends Component {
     _addEffect(
       FlameParticleEffect.explosion(
           position: position.clone(),
-          color: Colors.purple,
+          color: MGColors.gem,
           radius: 50.0,
         ),
     );
@@ -87,7 +88,7 @@ class VfxManager extends Component {
     _addEffect(
       FlameParticleEffect.explosion(
           position: position.clone(),
-          color: Colors.cyan,
+          color: MGColors.energy,
           radius: 30.0,
         ),
     );

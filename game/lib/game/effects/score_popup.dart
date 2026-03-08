@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 /// Animated score popup when eating food
 class ScorePopup extends PositionComponent {
@@ -44,14 +45,14 @@ class ScorePopup extends PositionComponent {
     // Create fading text paint
     final fadingPaint = TextPaint(
       style: TextStyle(
-        color: Colors.yellow.withValues(alpha: opacity),
+        color: MGColors.gold.withValues(alpha: opacity),
         fontSize: 32 * scale,
         fontWeight: FontWeight.bold,
         shadows: [
           Shadow(
             offset: const Offset(2, 2),
             blurRadius: 4,
-            color: Colors.black.withValues(alpha: opacity * 0.5),
+            color: MGColors.backgroundDarkDark.withValues(alpha: opacity * 0.5),
           ),
         ],
       ),

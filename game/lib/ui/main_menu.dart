@@ -23,6 +23,7 @@ import 'package:mg_common_game/core/ui/screens/statistics_screen.dart';
 import 'package:mg_common_game/systems/progression/achievement_manager.dart';
 import 'package:mg_common_game/systems/settings/settings_manager.dart';
 import 'package:mg_common_game/core/ui/screens/settings_screen.dart' as common;
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 class MainMenu extends StatefulWidget {
   const MainMenu({super.key});
@@ -61,12 +62,12 @@ class _MainMenuState extends State<MainMenu> {
                           style: TextStyle(
                             fontSize: 70, // Slightly reduced to fit Korean
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF76c043), // Light Green
+                            color: MGColors.success, // Light Green
                             shadows: [
                               Shadow(
                                 offset: Offset(4, 4),
                                 blurRadius: 8,
-                                color: Colors.black45,
+                                color: MGColors.backgroundDarkDark.withValues(alpha: 0.45),
                               ),
                             ],
                           ),
@@ -76,12 +77,12 @@ class _MainMenuState extends State<MainMenu> {
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white70,
+                            color: MGColors.textMediumEmphasis,
                             shadows: [
                               Shadow(
                                 offset: Offset(2, 2),
                                 blurRadius: 4,
-                                color: Colors.black45,
+                                color: MGColors.backgroundDarkDark.withValues(alpha: 0.45),
                               ),
                             ],
                           ),
@@ -91,7 +92,7 @@ class _MainMenuState extends State<MainMenu> {
                         const Text(
                           '모드 선택',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: MGColors.textMediumEmphasis,
                             letterSpacing: 2,
                             fontWeight: FontWeight.bold,
                           ),
@@ -103,7 +104,7 @@ class _MainMenuState extends State<MainMenu> {
                           title: '일반',
                           description: '클래식 스네이크 게임',
                           icon: Icons.play_arrow,
-                          color: const Color(0xFF76c043),
+                          color: MGColors.success,
                           onTap: () =>
                               _startGame(context, SnakeGameMode.normal),
                           highScoreFuture: HighScoreManager.getHighScore(
@@ -224,9 +225,9 @@ class _MainMenuState extends State<MainMenu> {
       children: [
         IconButton(
           onPressed: onTap,
-          icon: Icon(icon, color: Colors.white, size: 32),
+          icon: Icon(icon, color: MGColors.textHighEmphasis, size: 32),
           style: IconButton.styleFrom(
-            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            backgroundColor: MGColors.textHighEmphasis.withValues(alpha: 0.2),
             padding: const EdgeInsets.all(12),
           ),
         ),
@@ -234,7 +235,7 @@ class _MainMenuState extends State<MainMenu> {
         Text(
           label,
           style: const TextStyle(
-            color: Colors.white,
+            color: MGColors.textHighEmphasis,
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -329,7 +330,7 @@ class _MainMenuState extends State<MainMenu> {
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.help_outline, color: Color(0xFF76c043)),
+            Icon(Icons.help_outline, color: MGColors.success),
             SizedBox(width: 8),
             Text('게임 방법'),
           ],
@@ -382,7 +383,7 @@ class _MainMenuState extends State<MainMenu> {
           prestigeManager: GetIt.I<PrestigeManager>(),
           progressionManager: GetIt.I<ProgressionManager>(),
           title: '스네이크 환생',
-          accentColor: const Color(0xFF76c043),
+          accentColor: MGColors.success,
           onClose: () => Navigator.of(context).pop(),
           onPrestige: () => _performPrestige(context),
         ),
@@ -408,7 +409,7 @@ class _MainMenuState extends State<MainMenu> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('환생 성공! $pointsGained 프레스티지 포인트를 얻었습니다!'),
-        backgroundColor: Colors.amber,
+        backgroundColor: MGColors.gold,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -422,7 +423,7 @@ class _MainMenuState extends State<MainMenu> {
         builder: (context) => DailyQuestScreen(
           questManager: GetIt.I<DailyQuestManager>(),
           title: '일일 퀘스트',
-          accentColor: const Color(0xFF76c043),
+          accentColor: MGColors.success,
           onClaimReward: (questId, goldReward, xpReward) {
             final goldManager = GetIt.I<GoldManager>();
             final progressionManager = GetIt.I<ProgressionManager>();
@@ -442,7 +443,7 @@ class _MainMenuState extends State<MainMenu> {
         builder: (context) => WeeklyChallengeScreen(
           challengeManager: GetIt.I<WeeklyChallengeManager>(),
           title: '주간 도전',
-          accentColor: Colors.amber,
+          accentColor: MGColors.gold,
           onClaimReward: (challengeId, goldReward, xpReward, prestigeReward) {
             final goldManager = GetIt.I<GoldManager>();
             final progressionManager = GetIt.I<ProgressionManager>();
@@ -470,7 +471,7 @@ class _MainMenuState extends State<MainMenu> {
           questManager: GetIt.I<DailyQuestManager>(),
           achievementManager: GetIt.I<AchievementManager>(),
           title: '통계',
-          accentColor: const Color(0xFF76c043),
+          accentColor: MGColors.success,
           onClose: () => Navigator.of(context).pop(),
         ),
       ),
@@ -483,7 +484,7 @@ class _MainMenuState extends State<MainMenu> {
         builder: (context) => common.SettingsScreen(
           settingsManager: GetIt.I<SettingsManager>(),
           title: '설정',
-          accentColor: const Color(0xFF76c043),
+          accentColor: MGColors.success,
           onClose: () => Navigator.of(context).pop(),
           version: '1.0.0',
         ),
@@ -515,11 +516,11 @@ class GameModeCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: MGColors.textHighEmphasis,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: MGColors.backgroundDarkDark.withValues(alpha: 0.2),
             offset: const Offset(0, 4),
             blurRadius: 8,
           ),
@@ -556,13 +557,13 @@ class GameModeCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: MGColors.backgroundDarkDark.withValues(alpha: 0.87),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         description,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: 14, color: MGColors.common),
                       ),
                     ],
                   ),
@@ -580,22 +581,22 @@ class GameModeCard extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.amber.shade100,
+                            color: MGColors.gold,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.amber),
+                            border: Border.all(color: MGColors.gold),
                           ),
                           child: Column(
                             children: [
                               const Icon(
                                 Icons.emoji_events,
                                 size: 16,
-                                color: Colors.orange,
+                                color: MGColors.warning,
                               ),
                               Text(
                                 '${snapshot.data}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.orange,
+                                  color: MGColors.warning,
                                 ),
                               ),
                             ],

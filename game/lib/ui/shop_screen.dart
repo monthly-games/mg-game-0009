@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
 import '../game/skin_manager.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
@@ -35,11 +36,11 @@ class _ShopScreenState extends State<ShopScreen>
       appBar: AppBar(
         title: const Text(
           'Shop',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: MGColors.textHighEmphasis),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: MGColors.textHighEmphasis),
         actions: [
           StreamBuilder<int>(
             stream: _goldManager.onGoldChanged,
@@ -53,22 +54,22 @@ class _ShopScreenState extends State<ShopScreen>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.2),
+                  color: MGColors.gold.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.amber),
+                  border: Border.all(color: MGColors.gold),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.monetization_on,
-                      color: Colors.amber,
+                      color: MGColors.gold,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '$gold',
                       style: const TextStyle(
-                        color: Colors.amber,
+                        color: MGColors.gold,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -81,9 +82,9 @@ class _ShopScreenState extends State<ShopScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: const Color(0xFF76c043),
-          labelColor: const Color(0xFF76c043),
-          unselectedLabelColor: Colors.grey,
+          indicatorColor: MGColors.success,
+          labelColor: MGColors.success,
+          unselectedLabelColor: MGColors.common,
           tabs: const [
             Tab(text: 'Snake Skins', icon: Icon(Icons.gesture)),
             Tab(text: 'Food Skins', icon: Icon(Icons.restaurant)),
@@ -148,22 +149,22 @@ class _ShopScreenState extends State<ShopScreen>
         Color previewColor;
         switch (skin) {
           case FoodSkin.apple:
-            previewColor = Colors.red;
+            previewColor = MGColors.error;
             break;
           case FoodSkin.mouse:
-            previewColor = Colors.grey;
+            previewColor = MGColors.common;
             break;
           case FoodSkin.burger:
-            previewColor = Colors.orange;
+            previewColor = MGColors.warning;
             break;
           case FoodSkin.diamond:
-            previewColor = Colors.cyan;
+            previewColor = MGColors.energy;
             break;
           case FoodSkin.coin:
-            previewColor = Colors.amber;
+            previewColor = MGColors.gold;
             break;
           case FoodSkin.potion:
-            previewColor = Colors.purple;
+            previewColor = MGColors.gem;
             break;
         }
 
@@ -193,14 +194,14 @@ class _ShopScreenState extends State<ShopScreen>
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey.shade900,
+          color: MGColors.common,
           borderRadius: BorderRadius.circular(16),
           border: isSelected
-              ? Border.all(color: const Color(0xFF76c043), width: 3)
-              : Border.all(color: Colors.white10),
+              ? Border.all(color: MGColors.success, width: 3)
+              : Border.all(color: MGColors.textDisabled),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: MGColors.backgroundDarkDark.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -228,7 +229,7 @@ class _ShopScreenState extends State<ShopScreen>
                     ],
                   ),
                   child: !isUnlocked
-                      ? const Icon(Icons.lock, color: Colors.white54, size: 32)
+                      ? const Icon(Icons.lock, color: MGColors.textDisabled, size: 32)
                       : null,
                 ),
               ),
@@ -242,7 +243,7 @@ class _ShopScreenState extends State<ShopScreen>
                   Text(
                     name,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: MGColors.textHighEmphasis,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -253,7 +254,7 @@ class _ShopScreenState extends State<ShopScreen>
                     const Text(
                       '선택됨',
                       style: TextStyle(
-                        color: Color(0xFF76c043),
+                        color: MGColors.success,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -262,7 +263,7 @@ class _ShopScreenState extends State<ShopScreen>
                     const Text(
                       '보유중',
                       style: TextStyle(
-                        color: Colors.white54,
+                        color: MGColors.textDisabled,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -273,14 +274,14 @@ class _ShopScreenState extends State<ShopScreen>
                       children: [
                         const Icon(
                           Icons.monetization_on,
-                          color: Colors.amber,
+                          color: MGColors.gold,
                           size: 14,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '$cost',
                           style: const TextStyle(
-                            color: Colors.amber,
+                            color: MGColors.gold,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -306,7 +307,7 @@ class _ShopScreenState extends State<ShopScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Purchased successfully!'),
-              backgroundColor: Colors.green,
+              backgroundColor: MGColors.success,
             ),
           );
         }
@@ -315,7 +316,7 @@ class _ShopScreenState extends State<ShopScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Not enough gold!'),
-              backgroundColor: Colors.red,
+              backgroundColor: MGColors.error,
             ),
           );
         }
@@ -333,7 +334,7 @@ class _ShopScreenState extends State<ShopScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Purchased successfully!'),
-              backgroundColor: Colors.green,
+              backgroundColor: MGColors.success,
             ),
           );
         }
@@ -342,7 +343,7 @@ class _ShopScreenState extends State<ShopScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Not enough gold!'),
-              backgroundColor: Colors.red,
+              backgroundColor: MGColors.error,
             ),
           );
         }

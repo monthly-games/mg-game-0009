@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 class PauseOverlay extends StatelessWidget {
   final VoidCallback onResume;
@@ -15,7 +16,7 @@ class PauseOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withValues(alpha: 0.7),
+      color: MGColors.backgroundDarkDark.withValues(alpha: 0.7),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -25,12 +26,12 @@ class PauseOverlay extends StatelessWidget {
               style: TextStyle(
                 fontSize: 64,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: MGColors.textHighEmphasis,
                 shadows: [
                   Shadow(
                     offset: Offset(4, 4),
                     blurRadius: 8,
-                    color: Colors.black45,
+                    color: MGColors.backgroundDarkDark.withValues(alpha: 0.45),
                   ),
                 ],
               ),
@@ -39,21 +40,21 @@ class PauseOverlay extends StatelessWidget {
             _PauseButton(
               icon: Icons.play_arrow,
               label: 'RESUME',
-              color: Colors.green,
+              color: MGColors.success,
               onPressed: onResume,
             ),
             const SizedBox(height: 20),
             _PauseButton(
               icon: Icons.refresh,
               label: 'RESTART',
-              color: Colors.orange,
+              color: MGColors.warning,
               onPressed: onRestart,
             ),
             const SizedBox(height: 20),
             _PauseButton(
               icon: Icons.home,
               label: 'MAIN MENU',
-              color: Colors.blue,
+              color: MGColors.info,
               onPressed: onMainMenu,
             ),
           ],
@@ -85,7 +86,7 @@ class _PauseButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
-          foregroundColor: Colors.white,
+          foregroundColor: MGColors.textHighEmphasis,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
@@ -133,13 +134,13 @@ class PauseButton extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.5),
+              color: MGColors.backgroundDarkDark.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(25),
-              border: Border.all(color: Colors.white, width: 2),
+              border: Border.all(color: MGColors.textHighEmphasis, width: 2),
             ),
             child: const Icon(
               Icons.pause,
-              color: Colors.white,
+              color: MGColors.textHighEmphasis,
               size: 30,
             ),
           ),

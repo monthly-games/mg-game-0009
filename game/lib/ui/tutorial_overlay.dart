@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 class TutorialOverlay extends StatefulWidget {
   final VoidCallback onComplete;
@@ -91,7 +92,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
     final step = _steps[_currentStep];
 
     return Container(
-      color: Colors.black.withValues(alpha: 0.85),
+      color: MGColors.backgroundDarkDark.withValues(alpha: 0.85),
       child: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -107,7 +108,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                       Icon(
                         step.icon,
                         size: 80,
-                        color: const Color(0xFF76c043),
+                        color: MGColors.success,
                       ),
                       const SizedBox(height: 40),
                       if (_currentStep == 0)
@@ -140,7 +141,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                       style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: MGColors.textHighEmphasis,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -149,7 +150,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                       step.description,
                       style: const TextStyle(
                         fontSize: 20,
-                        color: Colors.white70,
+                        color: MGColors.textMediumEmphasis,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -165,8 +166,8 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: index == _currentStep
-                                ? const Color(0xFF76c043)
-                                : Colors.white30,
+                                ? MGColors.success
+                                : MGColors.textDisabled,
                           ),
                         ),
                       ),
@@ -178,8 +179,8 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                       child: ElevatedButton(
                         onPressed: _nextStep,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF76c043),
-                          foregroundColor: Colors.white,
+                          backgroundColor: MGColors.success,
+                          foregroundColor: MGColors.textHighEmphasis,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -203,7 +204,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                           'Skip Tutorial',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white54,
+                            color: MGColors.textDisabled,
                           ),
                         ),
                       ),
@@ -227,7 +228,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
           child: Icon(
             icon,
             size: 40,
-            color: Colors.white,
+            color: MGColors.textHighEmphasis,
           ),
         );
       },

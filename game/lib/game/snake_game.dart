@@ -12,6 +12,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mg_common_game/core/audio/audio_manager.dart';
 import '../utils/high_score_manager.dart';
 import 'skin_manager.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 enum Direction { up, down, left, right }
 
@@ -389,7 +390,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
   void _drawGrid(Canvas canvas, double offsetX, double offsetY) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
+      ..color = MGColors.textDisabled
       ..strokeWidth = 1;
 
     for (int i = 0; i <= gridSize; i++) {
@@ -425,25 +426,25 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     }
 
     // Fallback logic
-    Color foodColor = Colors.red;
+    Color foodColor = MGColors.error;
     switch (_skinManager.currentFoodSkin) {
       case FoodSkin.apple:
-        foodColor = Colors.red;
+        foodColor = MGColors.error;
         break;
       case FoodSkin.mouse:
-        foodColor = Colors.grey;
+        foodColor = MGColors.common;
         break;
       case FoodSkin.burger:
-        foodColor = Colors.orange;
+        foodColor = MGColors.warning;
         break;
       case FoodSkin.diamond:
-        foodColor = Colors.cyan;
+        foodColor = MGColors.energy;
         break;
       case FoodSkin.coin:
-        foodColor = Colors.amber;
+        foodColor = MGColors.gold;
         break;
       case FoodSkin.potion:
-        foodColor = Colors.purple;
+        foodColor = MGColors.gem;
         break;
     }
 
@@ -573,7 +574,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
       // Eyes for head logic ... (omitted for brevity, duplicate of previous logic)
       if (isHead) {
-        final eyePaint = Paint()..color = Colors.white;
+        final eyePaint = Paint()..color = MGColors.textHighEmphasis;
         // ... simple eye dot
         canvas.drawCircle(
           Offset(
@@ -590,7 +591,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
   void _drawUI(Canvas canvas) {
     final textPaint = TextPaint(
       style: const TextStyle(
-        color: Colors.white,
+        color: MGColors.textHighEmphasis,
         fontSize: 32,
         fontWeight: FontWeight.bold,
       ),
@@ -603,11 +604,11 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     if (mode == SnakeGameMode.timeAttack) {
       final timerPaint = TextPaint(
         style: TextStyle(
-          color: remainingTime <= 10 ? Colors.red : Colors.white,
+          color: remainingTime <= 10 ? MGColors.error : MGColors.textHighEmphasis,
           fontSize: 32,
           fontWeight: FontWeight.bold,
           shadows: const [
-            Shadow(offset: Offset(2, 2), blurRadius: 3, color: Colors.black),
+            Shadow(offset: Offset(2, 2), blurRadius: 3, color: MGColors.backgroundDarkDark),
           ],
         ),
       );
@@ -626,7 +627,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     // 시작 전 안내
     if (!gameStarted && !gameOver) {
       final startPaint = TextPaint(
-        style: const TextStyle(color: Colors.white, fontSize: 32),
+        style: const TextStyle(color: MGColors.textHighEmphasis, fontSize: 32),
       );
 
       startPaint.render(

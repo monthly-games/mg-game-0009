@@ -18,6 +18,7 @@ import 'package:mg_common_game/core/systems/save_manager_helper.dart';
 import 'game/skin_manager.dart';
 import 'screens/daily_quest_screen.dart';
 import 'screens/achievement_screen.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -400,7 +401,7 @@ class SnakeGameApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF76c043),
+          seedColor: MGColors.success,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,

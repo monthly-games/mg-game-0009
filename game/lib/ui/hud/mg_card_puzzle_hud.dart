@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mg_common_game/core/ui/mg_ui.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 /// MG UI 기반 Card Puzzle 게임 HUD
 /// mg_common_game??공통 UI 컴포?�트 ?�용
@@ -46,8 +47,8 @@ class MGCardPuzzleHud extends StatelessWidget {
                   icon: isPaused ? Icons.play_arrow : Icons.pause,
                   onPressed: isPaused ? onResume : onPause,
                   size: 44,
-                  backgroundColor: Colors.black54,
-                  color: Colors.white,
+                  backgroundColor: MGColors.backgroundDark.withValues(alpha: 0.54),
+                  color: MGColors.textHighEmphasis,
                 ),
 
                 // ?�수 ?�시
@@ -98,7 +99,7 @@ class MGCardPuzzleHud extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: MGColors.backgroundDark.withValues(alpha: 0.54),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -106,14 +107,14 @@ class MGCardPuzzleHud extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.emoji_events,
-                      color: Colors.amber,
+                      color: MGColors.gold,
                       size: 20,
                     ),
                     MGSpacing.hXs,
                     Text(
                       'Best: $highScore',
                       style: MGTextStyles.hudSmall.copyWith(
-                        color: Colors.white70,
+                        color: MGColors.textHighEmphasis.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -129,7 +130,7 @@ class MGCardPuzzleHud extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.black54,
+        color: MGColors.backgroundDark.withValues(alpha: 0.54),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: MGColors.warning.withValues(alpha: 0.5),
@@ -139,7 +140,7 @@ class MGCardPuzzleHud extends StatelessWidget {
       child: Text(
         '$score',
         style: MGTextStyles.display.copyWith(
-          color: Colors.white,
+          color: MGColors.textHighEmphasis,
           fontWeight: FontWeight.bold,
           fontSize: 36,
         ),
@@ -151,7 +152,7 @@ class MGCardPuzzleHud extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black54,
+        color: MGColors.backgroundDark.withValues(alpha: 0.54),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -159,14 +160,14 @@ class MGCardPuzzleHud extends StatelessWidget {
         children: [
           const Icon(
             Icons.linear_scale,
-            color: Colors.green,
+            color: MGColors.success,
             size: 20,
           ),
           MGSpacing.hXs,
           Text(
             'Length: $length',
             style: MGTextStyles.hud.copyWith(
-              color: Colors.white,
+              color: MGColors.textHighEmphasis,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -181,10 +182,10 @@ class MGCardPuzzleHud extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black54,
+        color: MGColors.backgroundDark.withValues(alpha: 0.54),
         borderRadius: BorderRadius.circular(12),
         border: isLow
-            ? Border.all(color: Colors.red.withValues(alpha: 0.7), width: 2)
+            ? Border.all(color: MGColors.error.withValues(alpha: 0.7), width: 2)
             : null,
       ),
       child: Row(
@@ -192,14 +193,14 @@ class MGCardPuzzleHud extends StatelessWidget {
         children: [
           Icon(
             Icons.timer,
-            color: isLow ? Colors.red : Colors.orange,
+            color: isLow ? MGColors.error : MGColors.warning,
             size: 20,
           ),
           MGSpacing.hXs,
           Text(
             '${timeRemaining}s',
             style: MGTextStyles.hud.copyWith(
-              color: isLow ? Colors.red : Colors.white,
+              color: isLow ? MGColors.error : MGColors.textHighEmphasis,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 enum SnakeSkin {
-  classic(0, '기본', Color(0xFF4CAF50), 0),
+  classic(0, '기본', MGColors.success, 0),
   neonBlue(500, '네온 블루', Color(0xFF00FFFF), 1),
   rubyRed(1000, '루비 레드', Color(0xFFFF0055), 2),
-  golden(2500, '골드', Color(0xFFFFD700), 3),
-  obsidian(1500, '옵시디언', Color(0xFF222222), 4),
+  golden(2500, '골드', MGColors.gold, 3),
+  obsidian(1500, '옵시디언', MGColors.cardDark, 4),
   pixel(800, '레트로 픽셀', Color(0xFF00FF00), 5),
   lava(1200, '용암', Color(0xFFFF5722), 6),
   ice(1200, '얼음', Color(0xFFE0F7FA), 7),
   cyber(2000, '사이버펑크', Color(0xFFD500F9), 8),
-  ghost(3000, '유령', Color(0xAAFFFFFF), 9);
+  ghost(3000, '유령', MGColors.textHighEmphasis.withValues(alpha: 0.67), 9);
 
   final int cost;
   final String name;
