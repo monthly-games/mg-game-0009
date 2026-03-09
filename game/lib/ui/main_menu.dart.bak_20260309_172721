@@ -678,7 +678,6 @@ class _GameScreenState extends State<GameScreen> {
                     setState(() => _showPause = true);
                   },
                   onResume: null,
-                  onDailyHub: () => Navigator.of(context).pushNamed('/daily-hub'),
                 );
               },
             ),
