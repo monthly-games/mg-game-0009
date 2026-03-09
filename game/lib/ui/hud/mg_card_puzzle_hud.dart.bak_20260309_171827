@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:mg_common_game/core/ui/mg_ui.dart';
 import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
-/// MG UI Card Puzzle HUD
-/// mg_common_game UI components
+/// MG UI ê¸°ë°˜ Card Puzzle ê²Œì„ HUD
+/// mg_common_game??ê³µí†µ UI ì»´í¬?ŒíŠ¸ ?œìš©
 class MGCardPuzzleHud extends StatelessWidget {
   final int score;
   final int highScore;
   final int length;
   final int coins;
-  final int? timeRemaining; // timer mode
-  final bool isPaused;
+  final int? timeRemaining; // ?€?„ì–´??ëª¨ë“œ??  final bool isPaused;
   final VoidCallback? onPause;
   final VoidCallback? onResume;
-  final VoidCallback? onDailyHub;
 
   const MGCardPuzzleHud({
     super.key,
@@ -25,7 +23,6 @@ class MGCardPuzzleHud extends StatelessWidget {
     this.isPaused = false,
     this.onPause,
     this.onResume,
-    this.onDailyHub,
   });
 
   @override
@@ -35,7 +32,7 @@ class MGCardPuzzleHud extends StatelessWidget {
     return Positioned.fill(
       child: Column(
         children: [
-          // ...
+          // ?ë‹¨ HUD: ?¼ì‹œ?•ì? + ?ìˆ˜ + ì½”ì¸
           Container(
             padding: EdgeInsets.only(
               top: safeArea.top + MGSpacing.hudMargin,
@@ -45,17 +42,7 @@ class MGCardPuzzleHud extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ...
-        if (onDailyHub != null)
-          MGIconButton(
-            icon: Icons.calendar_today,
-            onPressed: onDailyHub,
-            size: 44,
-            backgroundColor: MGColors.info.withValues(alpha: 0.8),
-            color: MGColors.textHighEmphasis,
-            tooltip: 'Daily Hub',
-          ),
-        MGSpacing.hXs,
+                // ?¼ì‹œ?•ì? ë²„íŠ¼
                 MGIconButton(
                   icon: isPaused ? Icons.play_arrow : Icons.pause,
                   onPressed: isPaused ? onResume : onPause,
@@ -64,10 +51,10 @@ class MGCardPuzzleHud extends StatelessWidget {
                   color: MGColors.textHighEmphasis,
                 ),
 
-                // ...
+                // ?ìˆ˜ ?œì‹œ
                 _buildScoreDisplay(),
 
-                // ...
+                // ì½”ì¸ ?œì‹œ
                 MGResourceBar(
                   icon: Icons.monetization_on,
                   value: _formatNumber(coins),
@@ -80,7 +67,7 @@ class MGCardPuzzleHud extends StatelessWidget {
 
           MGSpacing.vSm,
 
-          // ...
+          // ë±€ ê¸¸ì´ + ?€?´ë¨¸ ?œì‹œ
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: safeArea.left + MGSpacing.hudMargin,
@@ -97,10 +84,10 @@ class MGCardPuzzleHud extends StatelessWidget {
             ),
           ),
 
-          // ...
+          // ì¤‘ì•™ ?ì—­ ?•ì¥ (ê²Œì„ ?ì—­)
           const Expanded(child: SizedBox()),
 
-          // ...
+          // ?˜ë‹¨: ìµœê³  ?ìˆ˜ (?„ìš”??
           if (highScore > 0)
             Container(
               padding: EdgeInsets.only(
