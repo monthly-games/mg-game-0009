@@ -502,12 +502,13 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
         if (diff.x > 0) {
           rotation =
               0; // Prev is right -> Tail points right (wait, tail should point away?)
-        } else if (diff.x < 0)
+        } else if (diff.x < 0) {
           rotation = 3.14159;
-        else if (diff.y > 0)
+        } else if (diff.y > 0) {
           rotation = 1.5708;
-        else if (diff.y < 0)
+        } else if (diff.y < 0) {
           rotation = 4.71239;
+        }
       } else {
         // Body
         colIndex = 1;
