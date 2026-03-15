@@ -57,7 +57,7 @@ class _MainMenuState extends State<MainMenu> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Game Title
-                        const Text(
+                        Text(
                           '스네이크',
                           style: TextStyle(
                             fontSize: 70, // Slightly reduced to fit Korean
@@ -65,14 +65,14 @@ class _MainMenuState extends State<MainMenu> {
                             color: MGColors.success, // Light Green
                             shadows: [
                               Shadow(
-                                offset: Offset(4, 4),
+                                offset: const Offset(4, 4),
                                 blurRadius: 8,
-                                color: MGColors.backgroundDarkDark.withValues(alpha: 0.45),
+                                color: MGColors.backgroundDark.withValues(alpha: 0.45),
                               ),
                             ],
                           ),
                         ),
-                        const Text(
+                        Text(
                           '게임',
                           style: TextStyle(
                             fontSize: 40,
@@ -80,9 +80,9 @@ class _MainMenuState extends State<MainMenu> {
                             color: MGColors.textMediumEmphasis,
                             shadows: [
                               Shadow(
-                                offset: Offset(2, 2),
+                                offset: const Offset(2, 2),
                                 blurRadius: 4,
-                                color: MGColors.backgroundDarkDark.withValues(alpha: 0.45),
+                                color: MGColors.backgroundDark.withValues(alpha: 0.45),
                               ),
                             ],
                           ),
@@ -520,7 +520,7 @@ class GameModeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: MGColors.backgroundDarkDark.withValues(alpha: 0.2),
+            color: MGColors.backgroundDark.withValues(alpha: 0.2),
             offset: const Offset(0, 4),
             blurRadius: 8,
           ),
@@ -554,16 +554,16 @@ class GameModeCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: MGColors.backgroundDarkDark.withValues(alpha: 0.87),
+                          color: MGColors.backgroundDark.withValues(alpha: 0.87),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         description,
-                        style: TextStyle(fontSize: 14, color: MGColors.common),
+                        style: const TextStyle(fontSize: 14, color: MGColors.common),
                       ),
                     ],
                   ),
@@ -680,16 +680,13 @@ class _GameScreenState extends State<GameScreen> {
                   onResume: null,
                   onDailyHub: () => Navigator.of(context).pushNamed('/daily-hub'),
                   onGuildWar: () {
-                    game.pauseEngine();
-                    Navigator.of(context).pushNamed('/guild-war').then((_) => game.resumeEngine());
+Navigator.of(context).pushNamed('/guild-war');
                   },
                   onTournament: () {
-                    game.pauseEngine();
-                    Navigator.of(context).pushNamed('/tournament').then((_) => game.resumeEngine());
+Navigator.of(context).pushNamed('/tournament');
                   },
                   onSeasonalEvent: () {
-                    game.pauseEngine();
-                    Navigator.of(context).pushNamed('/seasonal-event').then((_) => game.resumeEngine());
+Navigator.of(context).pushNamed('/seasonal-event');
                   },
                 );
               },

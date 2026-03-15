@@ -1,6 +1,6 @@
 /// VFX Manager for MG-0009 Snake Game
+library;
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:mg_common_game/core/engine/effects/flame_effects.dart';
 import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 

@@ -74,7 +74,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
             border: Border.all(color: MGColors.textDisabled, width: 2),
             boxShadow: [
               BoxShadow(
-                color: MGColors.backgroundDarkDark.withValues(alpha: 0.5),
+                color: MGColors.backgroundDark.withValues(alpha: 0.5),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -192,7 +192,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                 child: const Text(
                   'NEW',
                   style: TextStyle(
-                    color: MGColors.backgroundDarkDark,
+                    color: MGColors.backgroundDark,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),

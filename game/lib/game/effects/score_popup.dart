@@ -52,7 +52,7 @@ class ScorePopup extends PositionComponent {
           Shadow(
             offset: const Offset(2, 2),
             blurRadius: 4,
-            color: MGColors.backgroundDarkDark.withValues(alpha: opacity * 0.5),
+            color: MGColors.backgroundDark.withValues(alpha: opacity * 0.5),
           ),
         ],
       ),

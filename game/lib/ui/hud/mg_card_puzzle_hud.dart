@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mg_common_game/core/ui/mg_ui.dart';
-import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 /// MG UI Card Puzzle HUD
 /// mg_common_game UI components

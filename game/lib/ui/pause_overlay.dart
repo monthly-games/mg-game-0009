@@ -16,12 +16,12 @@ class PauseOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: MGColors.backgroundDarkDark.withValues(alpha: 0.7),
+      color: MGColors.backgroundDark.withValues(alpha: 0.7),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'PAUSED',
               style: TextStyle(
                 fontSize: 64,
@@ -29,9 +29,9 @@ class PauseOverlay extends StatelessWidget {
                 color: MGColors.textHighEmphasis,
                 shadows: [
                   Shadow(
-                    offset: Offset(4, 4),
+                    offset: const Offset(4, 4),
                     blurRadius: 8,
-                    color: MGColors.backgroundDarkDark.withValues(alpha: 0.45),
+                    color: MGColors.backgroundDark.withValues(alpha: 0.45),
                   ),
                 ],
               ),
@@ -134,7 +134,7 @@ class PauseButton extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: MGColors.backgroundDarkDark.withValues(alpha: 0.5),
+              color: MGColors.backgroundDark.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(25),
               border: Border.all(color: MGColors.textHighEmphasis, width: 2),
             ),

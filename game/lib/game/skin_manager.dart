@@ -14,7 +14,7 @@ enum SnakeSkin {
   lava(1200, '용암', Color(0xFFFF5722), 6),
   ice(1200, '얼음', Color(0xFFE0F7FA), 7),
   cyber(2000, '사이버펑크', Color(0xFFD500F9), 8),
-  ghost(3000, '유령', MGColors.textHighEmphasis.withValues(alpha: 0.67), 9);
+  ghost(3000, '유령', Color(0xAAFFFFFF), 9); // ~67% white (was MGColors.textHighEmphasis.withValues)
 
   final int cost;
   final String name;

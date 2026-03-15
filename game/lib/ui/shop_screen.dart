@@ -201,7 +201,7 @@ class _ShopScreenState extends State<ShopScreen>
               : Border.all(color: MGColors.textDisabled),
           boxShadow: [
             BoxShadow(
-              color: MGColors.backgroundDarkDark.withValues(alpha: 0.3),
+              color: MGColors.backgroundDark.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

@@ -608,7 +608,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
           fontSize: 32,
           fontWeight: FontWeight.bold,
           shadows: const [
-            Shadow(offset: Offset(2, 2), blurRadius: 3, color: MGColors.backgroundDarkDark),
+            Shadow(offset: Offset(2, 2), blurRadius: 3, color: MGColors.backgroundDark),
           ],
         ),
       );
