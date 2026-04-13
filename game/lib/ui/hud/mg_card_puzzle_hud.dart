@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mg_common_game/core/ui/mg_ui.dart';
 
 /// MG UI Card Puzzle HUD
@@ -265,4 +266,34 @@ class MGCardPuzzleHud extends StatelessWidget {
     }
     return number.toString();
   }
+
+
+  Widget _buildSpineCharacter() {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+      },
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.pink.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.pink.withAlpha(150), width: 2),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.person, size: 24, color: Colors.white),
+            SizedBox(height: 2),
+            Text(
+              'Card Master',
+              style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

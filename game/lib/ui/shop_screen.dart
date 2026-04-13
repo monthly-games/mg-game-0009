@@ -1,8 +1,11 @@
+import 'package:mg_common_game/core/ui/layout/mg_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
 import '../game/skin_manager.dart';
 import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
+import '../core/localization/app_localizations.dart';
+
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
@@ -42,11 +45,11 @@ class _ShopScreenState extends State<ShopScreen>
         elevation: 0,
         iconTheme: const IconThemeData(color: MGColors.textHighEmphasis),
         actions: [
-          StreamBuilder<int>(
-            stream: _goldManager.onGoldChanged,
-            initialData: _goldManager.currentGold,
-            builder: (context, snapshot) {
-              final gold = snapshot.data ?? 0;
+          AnimatedBuilder(
+            animation: _goldManager,
+            builder: (context, child) {
+              final gold = _goldManager.currentGold;
+
               return Container(
                 margin: const EdgeInsets.only(right: 16),
                 padding: const EdgeInsets.symmetric(
@@ -65,7 +68,7 @@ class _ShopScreenState extends State<ShopScreen>
                       color: MGColors.gold,
                       size: 20,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: MGSpacing.xs),
                     Text(
                       '$gold',
                       style: const TextStyle(
@@ -105,7 +108,7 @@ class _ShopScreenState extends State<ShopScreen>
 
   Widget _buildSnakeTab() {
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(MGSpacing.md),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.8,
@@ -132,7 +135,7 @@ class _ShopScreenState extends State<ShopScreen>
 
   Widget _buildFoodTab() {
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(MGSpacing.md),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.8,
@@ -237,7 +240,7 @@ class _ShopScreenState extends State<ShopScreen>
 
             // Info
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(MGSpacing.sm),
               child: Column(
                 children: [
                   Text(
@@ -249,7 +252,7 @@ class _ShopScreenState extends State<ShopScreen>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: MGSpacing.xs),
                   if (isSelected)
                     const Text(
                       '선택됨',
@@ -277,7 +280,7 @@ class _ShopScreenState extends State<ShopScreen>
                           color: MGColors.gold,
                           size: 14,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: MGSpacing.xxs),
                         Text(
                           '$cost',
                           style: const TextStyle(
@@ -305,8 +308,8 @@ class _ShopScreenState extends State<ShopScreen>
         final success = await _skinManager.unlockSnakeSkin(skin);
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Purchased successfully!'),
+            SnackBar(
+              content: Text(context.l10n.shopPurchasedSuccessfully),
               backgroundColor: MGColors.success,
             ),
           );
@@ -314,8 +317,8 @@ class _ShopScreenState extends State<ShopScreen>
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Not enough gold!'),
+            SnackBar(
+              content: Text(context.l10n.uiGeneralNotEnoughGold),
               backgroundColor: MGColors.error,
             ),
           );
@@ -332,8 +335,8 @@ class _ShopScreenState extends State<ShopScreen>
         final success = await _skinManager.unlockFoodSkin(skin);
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Purchased successfully!'),
+            SnackBar(
+              content: Text(context.l10n.shopPurchasedSuccessfully),
               backgroundColor: MGColors.success,
             ),
           );
@@ -341,8 +344,8 @@ class _ShopScreenState extends State<ShopScreen>
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Not enough gold!'),
+            SnackBar(
+              content: Text(context.l10n.uiGeneralNotEnoughGold),
               backgroundColor: MGColors.error,
             ),
           );

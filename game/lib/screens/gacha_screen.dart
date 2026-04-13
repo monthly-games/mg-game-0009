@@ -1,8 +1,9 @@
 // ============================================================
-// Gacha Screen — MG-0009 Hero Collection Card Puzzle
+// Gacha Screen -- MG-0009 Hero Collection Card Puzzle
 // Genre: Card Puzzle · Gacha System UI
 // ============================================================
 
+import '../core/localization/app_localizations.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -170,7 +171,7 @@ class _GachaScreenState extends State<GachaScreen>
                 Padding(
                   padding: const EdgeInsets.all(MGSpacing.lg),
                   child: MGButton(
-                    label: 'OK',
+                    label: context.l10n.uiGeneralDiwaliTokenCollection,
                     onPressed: _dismissResults,
                     size: MGButtonSize.large,
                     width: double.infinity,
@@ -512,7 +513,7 @@ class _GachaScreenState extends State<GachaScreen>
       children: [
         Expanded(
           child: GachaPullButton(
-            label: '1x Pull',
+            label: context.l10n.uiGeneral1xPull,
             cost: _kSinglePullCost,
             onPressed: _onSinglePull,
           ),
@@ -520,7 +521,7 @@ class _GachaScreenState extends State<GachaScreen>
         const SizedBox(width: MGSpacing.md),
         Expanded(
           child: GachaPullButton(
-            label: '10x Pull',
+            label: context.l10n.uiGeneral10xPull,
             cost: _kMultiPullCost,
             onPressed: _onMultiPull,
           ),

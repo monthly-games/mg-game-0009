@@ -390,25 +390,25 @@ Future<void> _setupDI() async {
   if (!GetIt.I.isRegistered<CollectionManager>()) {
     GetIt.I.registerSingleton(CollectionManager());
   // ── Retention Systems for DailyHub ────────────────────────
-  if (!GetIt.I.isRegistered<LoginRewardsManager>()) {
-    GetIt.I.registerSingleton(LoginRewardsManager());
-  }
-  if (!GetIt.I.isRegistered<StreakManager>()) {
-    GetIt.I.registerSingleton(StreakManager());
-  }
-  if (!GetIt.I.isRegistered<DailyChallengeManager>()) {
-    GetIt.I.registerSingleton(DailyChallengeManager());
-}
-  // ── P3 Engine Systems ─────────────────────────────────────
-  if (!GetIt.I.isRegistered<GuildWarManager>()) {
-    GetIt.I.registerSingleton(GuildWarManager());
-  }
-  if (!GetIt.I.isRegistered<TournamentManager>()) {
-    GetIt.I.registerSingleton(TournamentManager());
-  }
-  if (!GetIt.I.isRegistered<SeasonalContentManager>()) {
-    GetIt.I.registerSingleton(SeasonalContentManager());
-  }
+  //   if (!GetIt.I.isRegistered<LoginRewardsManager>()) {
+  //     GetIt.I.registerSingleton(LoginRewardsManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<StreakManager>()) {
+  //     GetIt.I.registerSingleton(StreakManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<DailyChallengeManager>()) {
+  //     GetIt.I.registerSingleton(DailyChallengeManager());
+  // }
+  //   // ── P3 Engine Systems ─────────────────────────────────────
+  //   if (!GetIt.I.isRegistered<GuildWarManager>()) {
+  //     GetIt.I.registerSingleton(GuildWarManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<TournamentManager>()) {
+  //     GetIt.I.registerSingleton(TournamentManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<SeasonalContentManager>()) {
+  //     GetIt.I.registerSingleton(SeasonalContentManager());
+  //   }
     _registerCollections();
   }
 

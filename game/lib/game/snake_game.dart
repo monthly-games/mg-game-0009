@@ -26,10 +26,10 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
   AudioManager get _audioManager => GetIt.I<AudioManager>();
   SkinManager get _skinManager => GetIt.I<SkinManager>();
-  // 스와이프 감지를 위한 변수
+  // Swipe detection variables
   Vector2? _dragStart;
-  static const double swipeThreshold = 50.0; // 최소 스와이프 거리
-  static const int gridSize = 20; // 그리드 크기
+  static const double swipeThreshold = 50.0; // Minimum swipe distance
+  static const int gridSize = 20; // Grid size
 
   // Mode-based settings
   double get moveInterval {
@@ -43,8 +43,8 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     }
   }
 
-  List<Vector2> snake = []; // 뱀의 몸통 (그리드 좌표)
-  Vector2 food = Vector2.zero(); // 먹이 위치
+  List<Vector2> snake = []; // Snake body (grid coordinates)
+  Vector2 food = Vector2.zero(); // Food position
   Direction currentDirection = Direction.right;
   Direction nextDirection = Direction.right;
 
@@ -98,7 +98,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
   }
 
   void _initializeGame() {
-    // 뱀 초기 위치 (중앙, 3칸)
+    // Initial snake position (center, 3 cells)
     snake = [
       Vector2(gridSize / 2, gridSize / 2),
       Vector2(gridSize / 2 - 1, gridSize / 2),
@@ -118,7 +118,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
   }
 
   void _spawnFood() {
-    // 뱀이 없는 랜덤 위치에 먹이 생성
+    // Spawn food at random position not occupied by snake
     bool validPosition = false;
     while (!validPosition) {
       food = Vector2(
@@ -126,7 +126,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
         (Vector2.random().y * gridSize).floor().toDouble(),
       );
 
-      // 뱀과 겹치지 않는지 확인
+      // Check if food doesn't overlap with snake
       validPosition = !snake.any((segment) => segment == food);
     }
   }
@@ -155,10 +155,10 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
   }
 
   void _moveSnake() {
-    // 방향 업데이트 (다음 방향으로)
+    // Update direction (to next direction)
     currentDirection = nextDirection;
 
-    // 머리의 새 위치 계산
+    // Calculate new head position
     final head = snake.first;
     Vector2 newHead;
 
@@ -177,7 +177,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
         break;
     }
 
-    // 벽 충돌 체크
+    // Wall collision check
     if (newHead.x < 0 ||
         newHead.x >= gridSize ||
         newHead.y < 0 ||
@@ -186,16 +186,16 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       return;
     }
 
-    // 자기 자신과 충돌 체크
+    // Self collision check
     if (snake.any((segment) => segment == newHead)) {
       _endGame();
       return;
     }
 
-    // 새 머리 추가
+    // Add new head
     snake.insert(0, newHead);
 
-    // 먹이 먹었는지 확인
+    // Check if food eaten
     if (newHead == food) {
       score++;
       _audioManager.playSfx('eat.wav');
@@ -213,9 +213,9 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       add(ScorePopup(position: foodPixelPos, points: 1));
 
       _spawnFood();
-      // 꼬리는 제거하지 않음 (뱀이 길어짐)
+      // Don't remove tail (snake grows)
     } else {
-      // 꼬리 제거 (길이 유지)
+      // Remove tail (maintain length)
       snake.removeLast();
     }
   }
@@ -286,7 +286,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       return KeyEventResult.handled;
     }
 
-    // 방향 전환 (180도 회전은 불가)
+    // Direction change (180 degree turn not allowed)
     if (keysPressed.contains(LogicalKeyboardKey.arrowUp) ||
         keysPressed.contains(LogicalKeyboardKey.keyW)) {
       if (currentDirection != Direction.down) {
@@ -328,18 +328,18 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     super.onDragEnd(event);
     if (paused || _dragStart == null) return;
 
-    // velocity를 사용하여 방향 판단
+    // Use velocity to determine direction
     final velocity = event.velocity;
 
-    // 속도가 너무 작으면 무시
+    // Ignore if velocity is too small
     if (velocity.length < 100) {
       _dragStart = null;
       return;
     }
 
-    // 가로/세로 중 더 큰 방향으로 판단
+    // Determine based on larger horizontal/vertical component
     if (velocity.x.abs() > velocity.y.abs()) {
-      // 가로 스와이프
+      // Horizontal swipe
       if (velocity.x > 0 && currentDirection != Direction.left) {
         nextDirection = Direction.right;
         _audioManager.playSfx('turn.wav');
@@ -348,7 +348,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
         _audioManager.playSfx('turn.wav');
       }
     } else {
-      // 세로 스와이프
+      // Vertical swipe
       if (velocity.y > 0 && currentDirection != Direction.up) {
         nextDirection = Direction.down;
         _audioManager.playSfx('turn.wav');
@@ -358,7 +358,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       }
     }
 
-    // 게임 시작 (터치로 시작 가능)
+    // Start game (touch to start)
     if (!gameStarted && !gameOver) {
       gameStarted = true;
     }
@@ -370,21 +370,21 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
   void render(Canvas canvas) {
     super.render(canvas);
 
-    // 게임 보드 중앙 정렬을 위한 오프셋
+    // Offset for game board center alignment
     final boardSize = gridSize * cellSize;
     final offsetX = (size.x - boardSize) / 2;
     final offsetY = (size.y - boardSize) / 2;
 
-    // 그리드 그리기 (옅은 선)
+    // Draw grid (light lines)
     _drawGrid(canvas, offsetX, offsetY);
 
-    // 먹이 그리기
+    // Draw food
     _drawFood(canvas, offsetX, offsetY);
 
-    // 뱀 그리기
+    // Draw snake
     _drawSnake(canvas, offsetX, offsetY);
 
-    // UI 텍스트
+    // Draw UI text
     _drawUI(canvas);
   }
 
@@ -599,7 +599,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     );
 
     // 점수 표시
-    textPaint.render(canvas, '점수: $score', Vector2(20, 20));
+    textPaint.render(canvas, 'Score: $score', Vector2(20, 20));
 
     // Time Attack Timer Render
     if (mode == SnakeGameMode.timeAttack) {
@@ -615,17 +615,17 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       );
       timerPaint.render(
         canvas,
-        '시간: ${remainingTime.toStringAsFixed(1)}',
+        'Time: ${remainingTime.toStringAsFixed(1)}',
         Vector2(size.x - 220, 20),
       );
     }
 
-    // 게임 오버
+    // Game Over
     if (gameOver) {
       // Game Over text is now handled by overlay
     }
 
-    // 시작 전 안내
+    // Before start
     if (!gameStarted && !gameOver) {
       final startPaint = TextPaint(
         style: const TextStyle(color: MGColors.textHighEmphasis, fontSize: 32),
@@ -633,7 +633,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
       startPaint.render(
         canvas,
-        '화면을 터치하거나 키를 눌러 시작',
+        'Tap or press key to start',
         Vector2(size.x / 2 - 220, size.y / 2),
       );
     }

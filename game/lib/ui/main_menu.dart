@@ -660,15 +660,14 @@ class _GameScreenState extends State<GameScreen> {
 
           // MG Card Puzzle HUD (게임오버 아닐 때만)
           if (!_showTutorial && !_showPause && !_showGameOver)
-            StreamBuilder<int>(
-              stream: GetIt.I<GoldManager>().onGoldChanged,
-              initialData: GetIt.I<GoldManager>().currentGold,
-              builder: (context, snapshot) {
+            AnimatedBuilder(
+              animation: GetIt.I<GoldManager>(),
+              builder: (context, _) {
                 return MGCardPuzzleHud(
                   score: _game.score,
                   highScore: _highScore,
                   length: _game.snake.length,
-                  coins: snapshot.data ?? 0,
+                  coins: GetIt.I<GoldManager>().currentGold,
                   timeRemaining: widget.mode == SnakeGameMode.timeAttack
                       ? _game.remainingTime.toInt()
                       : null,

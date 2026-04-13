@@ -1,6 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, prefer_const_constructors
 // ============================================================
-// Daily Quest Screen — MG-0009 Snake Idle
+// Daily Quest Screen -- MG-0009 Snake Idle
 // Genre: Idle · Retention System UI
 //
 // Firebase Analytics Events:
@@ -13,6 +13,7 @@
 // ============================================================
 
 import 'dart:async';
+import '../core/localization/app_localizations.dart';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -330,7 +331,7 @@ class _DailyQuestScreenState extends State<DailyQuestScreen> {
               const Spacer(),
               if (isClaimable)
                 MGButton(
-                  label: 'Claim',
+                  label: context.l10n.notificationRewardsClaimed(quest.goldReward),
                   size: MGButtonSize.small,
                   icon: Icons.card_giftcard_rounded,
                   backgroundColor: MGColors.success,

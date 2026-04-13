@@ -1,7 +1,10 @@
+import 'package:mg_common_game/core/ui/layout/mg_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
 import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
+import '../core/localization/app_localizations.dart';
+
 
 class GameOverOverlay extends StatefulWidget {
   final int score;
@@ -66,7 +69,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(MGSpacing.lg),
           margin: const EdgeInsets.symmetric(horizontal: 40),
           decoration: BoxDecoration(
             color: const Color(0xFF1a1a1a),
@@ -93,18 +96,18 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                   letterSpacing: 2,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: MGSpacing.lg),
 
               // Scores
               _buildScoreRow('Score', '${widget.score}'),
-              const SizedBox(height: 12),
+              const SizedBox(height: MGSpacing.sm),
               _buildScoreRow(
                 'Best',
                 '${widget.highScore}',
                 isNewRecord: widget.isNewRecord,
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: MGSpacing.lg),
 
               // Gold Reward
               Container(
@@ -123,7 +126,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.monetization_on, color: MGColors.gold),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: MGSpacing.xs),
                     Text(
                       '+$_goldEarned Gold',
                       style: const TextStyle(
@@ -136,7 +139,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: MGSpacing.xl),
 
               // Buttons
               Row(
@@ -144,7 +147,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                 children: [
                   _buildButton(
                     icon: Icons.home,
-                    label: 'Menu',
+                    label: context.l10n.menuNavigationMainMenu,
                     color: MGColors.surfaceDark,
                     onTap: widget.onMainMenu,
                   ),
@@ -239,7 +242,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
           child: Column(
             children: [
               Icon(icon, color: MGColors.textHighEmphasis, size: 28),
-              const SizedBox(height: 4),
+              const SizedBox(height: MGSpacing.xxs),
               Text(
                 label,
                 style: const TextStyle(

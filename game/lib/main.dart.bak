@@ -1,27 +1,43 @@
+import 'package:mg_common_game/mg_common_game.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:mg_common_game/systems/systems.dart';
 import 'ui/main_menu.dart';
 
 import 'package:get_it/get_it.dart';
-import 'package:mg_common_game/core/audio/audio_manager.dart';
-import 'package:mg_common_game/systems/progression/progression_manager.dart';
-import 'package:mg_common_game/systems/progression/upgrade_manager.dart';
-import 'package:mg_common_game/systems/progression/achievement_manager.dart';
-import 'package:mg_common_game/systems/progression/prestige_manager.dart';
-import 'package:mg_common_game/systems/quests/daily_quest.dart';
-import 'package:mg_common_game/systems/quests/weekly_challenge.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
-import 'package:mg_common_game/systems/settings/settings_manager.dart';
-import 'package:mg_common_game/systems/stats/statistics_manager.dart';
-import 'package:mg_common_game/core/systems/save_manager_helper.dart';
+import 'package:mg_common_game/l10n/extensions.dart';
 import 'game/skin_manager.dart';
 import 'screens/daily_quest_screen.dart';
 import 'screens/achievement_screen.dart';
+import 'screens/collection_screen.dart';
+import 'game/tutorial_config.dart';
+import 'game/balancing_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _setupDI();
+  // ── Tutorial & Balancing ──────────────────────────────────
+  if (!GetIt.I.isRegistered<TutorialManager>()) {
+    final tutorialManager = TutorialManager();
+    await tutorialManager.initialize();
+    tutorialManager.registerTutorial(
+      kOnboardingTutorial.id,
+      kOnboardingTutorial.steps,
+    );
+    GetIt.I.registerSingleton<TutorialManager>(tutorialManager);
+  }
+  if (!GetIt.I.isRegistered<BalancingManager>()) {
+    GetIt.I.registerSingleton<BalancingManager>(
+      BalancingManager(defaultConfig: kDefaultBalancingConfig),
+    );
+  }
+  // ── Q7 DI Fix: Missing Systems ──────────────────────────
+  if (!GetIt.I.isRegistered<BattlePassManager>()) {
+    GetIt.I.registerSingleton<BattlePassManager>(BattlePassManager());
+  }
+  if (!GetIt.I.isRegistered<GachaManager>()) {
+    GetIt.I.registerSingleton<GachaManager>(GachaManager());
+  }
+
   runApp(const SnakeGameApp());
 }
 
@@ -374,6 +390,26 @@ Future<void> _setupDI() async {
   // Collection 시스템
   if (!GetIt.I.isRegistered<CollectionManager>()) {
     GetIt.I.registerSingleton(CollectionManager());
+  // ── Retention Systems for DailyHub ────────────────────────
+  //   if (!GetIt.I.isRegistered<LoginRewardsManager>()) {
+  //     GetIt.I.registerSingleton(LoginRewardsManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<StreakManager>()) {
+  //     GetIt.I.registerSingleton(StreakManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<DailyChallengeManager>()) {
+  //     GetIt.I.registerSingleton(DailyChallengeManager());
+  // }
+  //   // ── P3 Engine Systems ─────────────────────────────────────
+  //   if (!GetIt.I.isRegistered<GuildWarManager>()) {
+  //     GetIt.I.registerSingleton(GuildWarManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<TournamentManager>()) {
+  //     GetIt.I.registerSingleton(TournamentManager());
+  //   }
+  //   if (!GetIt.I.isRegistered<SeasonalContentManager>()) {
+  //     GetIt.I.registerSingleton(SeasonalContentManager());
+  //   }
     _registerCollections();
   }
 
@@ -400,7 +436,7 @@ class SnakeGameApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF76c043),
+          seedColor: MGColors.success,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
@@ -408,7 +444,34 @@ class SnakeGameApp extends StatelessWidget {
       routes: {
         '/daily-quest': (_) => const DailyQuestScreen(),
         '/achievements': (_) => const AchievementScreen(),
-      },
+        '/daily-hub': (context) => DailyHubScreen(
+          questManager: GetIt.I<DailyQuestManager>(),
+          loginRewardsManager: GetIt.I<LoginRewardsManager>(),
+          streakManager: GetIt.I<StreakManager>(),
+          challengeManager: GetIt.I<DailyChallengeManager>(),
+          accentColor: MGColors.primaryAction,
+          onClose: () => Navigator.pop(context),
+        ),
+      
+        '/collection': (context) => CollectionScreen(
+          collectionManager: GetIt.I<CollectionManager>(),
+        ),
+        '/guild-war': (context) => GuildWarScreen(
+          guildWarManager: GetIt.I<GuildWarManager>(),
+          accentColor: MGColors.primaryAction,
+          onClose: () => Navigator.pop(context),
+          ),
+        '/tournament': (context) => TournamentScreen(
+          tournamentManager: GetIt.I<TournamentManager>(),
+          accentColor: MGColors.primaryAction,
+          onClose: () => Navigator.pop(context),
+          ),
+        '/seasonal-event': (context) => SeasonalEventScreen(
+          seasonalContentManager: GetIt.I<SeasonalContentManager>(),
+          accentColor: MGColors.primaryAction,
+          onClose: () => Navigator.pop(context),
+          ),
+},
       home: const MainMenu(),
     );
   }
@@ -418,47 +481,47 @@ void _registerCollections() {
   final collection = GetIt.I<CollectionManager>();
 
   // Characters 컬렉션
-  collection.registerCollection(const Collection(
+  collection.registerCollection(Collection(
     id: 'characters',
     name: '캐릭터',
     description: '모든 캐릭터를 수집하세요',
     items: [
-      CollectionItem(
+      const CollectionItem(
         id: 'char_warrior',
         name: '전사',
         description: '강인한 근접 전투 캐릭터',
         rarity: CollectionRarity.common,
       ),
-      CollectionItem(
+      const CollectionItem(
         id: 'char_mage',
         name: '마법사',
         description: '강력한 마법 공격 캐릭터',
         rarity: CollectionRarity.rare,
       ),
-      CollectionItem(
+      const CollectionItem(
         id: 'char_archer',
         name: '궁수',
         description: '원거리 정밀 공격 캐릭터',
         rarity: CollectionRarity.rare,
       ),
-      CollectionItem(
+      const CollectionItem(
         id: 'char_assassin',
         name: '암살자',
         description: '치명적인 은신 공격 캐릭터',
         rarity: CollectionRarity.epic,
       ),
-      CollectionItem(
+      const CollectionItem(
         id: 'char_healer',
         name: '힐러',
         description: '팀을 치유하는 지원 캐릭터',
         rarity: CollectionRarity.legendary,
       ),
     ],
-    completionReward: CollectionReward(gold: 10000, gems: 500, experience: 2000),
+    completionReward: const CollectionReward(type: RewardType.gold, amount: 10000),
     milestoneRewards: {
-      25: CollectionReward(gold: 1000, gems: 50),
-      50: CollectionReward(gold: 3000, gems: 150),
-      75: CollectionReward(gold: 5000, gems: 300),
+      25: const CollectionReward(type: RewardType.gold, amount: 1000),
+      50: const CollectionReward(type: RewardType.gold, amount: 3000),
+      75: const CollectionReward(type: RewardType.gold, amount: 5000),
     },
   ));
 

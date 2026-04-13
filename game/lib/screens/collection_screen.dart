@@ -1,6 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, unused_local_variable
 // ============================================================
-// Collection Screen — MG-0009 Hero Collection Card Puzzle
+// Collection Screen -- MG-0009 Hero Collection Card Puzzle
 // Genre: Card Puzzle · Collection System UI
 //
 // Firebase Analytics Events:
