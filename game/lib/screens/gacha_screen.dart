@@ -3,7 +3,6 @@
 // Genre: Card Puzzle · Gacha System UI
 // ============================================================
 
-import '../core/localization/app_localizations.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -171,7 +170,7 @@ class _GachaScreenState extends State<GachaScreen>
                 Padding(
                   padding: const EdgeInsets.all(MGSpacing.lg),
                   child: MGButton(
-                    label: context.l10n.uiGeneralDiwaliTokenCollection,
+                    label: 'View collection',
                     onPressed: _dismissResults,
                     size: MGButtonSize.large,
                     width: double.infinity,
@@ -513,7 +512,7 @@ class _GachaScreenState extends State<GachaScreen>
       children: [
         Expanded(
           child: GachaPullButton(
-            label: context.l10n.uiGeneral1xPull,
+            label: '1x Pull',
             cost: _kSinglePullCost,
             onPressed: _onSinglePull,
           ),
@@ -521,7 +520,7 @@ class _GachaScreenState extends State<GachaScreen>
         const SizedBox(width: MGSpacing.md),
         Expanded(
           child: GachaPullButton(
-            label: context.l10n.uiGeneral10xPull,
+            label: '10x Pull',
             cost: _kMultiPullCost,
             onPressed: _onMultiPull,
           ),

@@ -13,8 +13,6 @@
 // ============================================================
 
 import 'dart:async';
-import '../core/localization/app_localizations.dart';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:get_it/get_it.dart';
@@ -331,7 +329,7 @@ class _DailyQuestScreenState extends State<DailyQuestScreen> {
               const Spacer(),
               if (isClaimable)
                 MGButton(
-                  label: context.l10n.notificationRewardsClaimed(quest.goldReward),
+                  label: 'Claim ${quest.goldReward} gold',
                   size: MGButtonSize.small,
                   icon: Icons.card_giftcard_rounded,
                   backgroundColor: MGColors.success,

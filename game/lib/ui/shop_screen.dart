@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
 import '../game/skin_manager.dart';
 import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
-import '../core/localization/app_localizations.dart';
 
 
 class ShopScreen extends StatefulWidget {
@@ -308,8 +307,8 @@ class _ShopScreenState extends State<ShopScreen>
         final success = await _skinManager.unlockSnakeSkin(skin);
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.shopPurchasedSuccessfully),
+            const SnackBar(
+              content: Text('Purchased successfully'),
               backgroundColor: MGColors.success,
             ),
           );
@@ -317,8 +316,8 @@ class _ShopScreenState extends State<ShopScreen>
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.uiGeneralNotEnoughGold),
+            const SnackBar(
+              content: Text('Not enough gold'),
               backgroundColor: MGColors.error,
             ),
           );
@@ -335,8 +334,8 @@ class _ShopScreenState extends State<ShopScreen>
         final success = await _skinManager.unlockFoodSkin(skin);
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.shopPurchasedSuccessfully),
+            const SnackBar(
+              content: Text('Purchased successfully'),
               backgroundColor: MGColors.success,
             ),
           );
@@ -344,8 +343,8 @@ class _ShopScreenState extends State<ShopScreen>
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.uiGeneralNotEnoughGold),
+            const SnackBar(
+              content: Text('Not enough gold'),
               backgroundColor: MGColors.error,
             ),
           );

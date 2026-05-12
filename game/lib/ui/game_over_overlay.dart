@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mg_common_game/core/economy/gold_manager.dart';
 import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
-import '../core/localization/app_localizations.dart';
 
 
 class GameOverOverlay extends StatefulWidget {
@@ -147,7 +146,7 @@ class _GameOverOverlayState extends State<GameOverOverlay>
                 children: [
                   _buildButton(
                     icon: Icons.home,
-                    label: context.l10n.menuNavigationMainMenu,
+                    label: 'Main Menu',
                     color: MGColors.surfaceDark,
                     onTap: widget.onMainMenu,
                   ),
