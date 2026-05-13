@@ -43,11 +43,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.2.2
 
-  firebase_core: any
+  firebase_core: ^2.32.0
   cloud_firestore: ^4.17.5
   firebase_auth: ^4.16.0
   firebase_remote_config: ^4.4.7
-  firebase_analytics: any
+  firebase_analytics: ^10.10.7
   firebase_messaging: ^14.7.10
 dev_dependencies:
   flutter_test:
