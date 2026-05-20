@@ -1,532 +1,434 @@
-import 'package:mg_common_game/mg_common_game.dart';
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'ui/main_menu.dart';
+import 'package:game/game/level_design_config.dart';
+import 'package:game/game/wave_spawn_table.dart';
 
-import 'package:get_it/get_it.dart';
-import 'package:mg_common_game/core/economy/gold_manager.dart';
-import 'game/skin_manager.dart';
-import 'screens/daily_quest_screen.dart';
-import 'screens/achievement_screen.dart';
-import 'screens/collection_screen.dart';
-import 'game/tutorial_config.dart';
-import 'game/balancing_config.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await _setupDI();
-  // ── Tutorial & Balancing ──────────────────────────────────
-  if (!GetIt.I.isRegistered<TutorialManager>()) {
-    final tutorialManager = TutorialManager();
-    await tutorialManager.initialize();
-    tutorialManager.registerTutorial(
-      kOnboardingTutorial.id,
-      kOnboardingTutorial.steps,
-    );
-    GetIt.I.registerSingleton<TutorialManager>(tutorialManager);
-  }
-  if (!GetIt.I.isRegistered<BalancingManager>()) {
-    GetIt.I.registerSingleton<BalancingManager>(
-      BalancingManager(defaultConfig: kDefaultBalancingConfig),
-    );
-  }
-  // ── Q7 DI Fix: Missing Systems ──────────────────────────
-  if (!GetIt.I.isRegistered<BattlePassManager>()) {
-    GetIt.I.registerSingleton<BattlePassManager>(BattlePassManager());
-  }
-  if (!GetIt.I.isRegistered<GachaManager>()) {
-    GetIt.I.registerSingleton<GachaManager>(GachaManager());
-  }
-
-  runApp(const SnakeGameApp());
+void main() {
+  runApp(const MyApp());
 }
 
-Future<void> _setupDI() async {
-  // 1. Audio Manager
-  if (!GetIt.I.isRegistered<AudioManager>()) {
-    final audioManager = AudioManager();
-    GetIt.I.registerSingleton<AudioManager>(audioManager);
-    await audioManager.initialize();
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  // 2. Progression Manager
-  if (!GetIt.I.isRegistered<ProgressionManager>()) {
-    final progressionManager = ProgressionManager();
-    GetIt.I.registerSingleton(progressionManager);
-
-    progressionManager.onLevelUp = (newLevel) {
-      if (GetIt.I.isRegistered<SettingsManager>()) {
-        GetIt.I<SettingsManager>().triggerVibration(
-          intensity: VibrationIntensity.heavy,
-        );
-      }
-    };
-  }
-
-  // 3. Upgrade Manager
-  if (!GetIt.I.isRegistered<UpgradeManager>()) {
-    final upgradeManager = UpgradeManager();
-    upgradeManager.registerUpgrade(
-      Upgrade(
-        id: 'snake_speed',
-        name: 'Speed Control',
-        description: 'Reduces starting speed by 5%',
-        maxLevel: 10,
-        baseCost: 200,
-        costMultiplier: 1.5,
-        valuePerLevel: 0.05,
-      ),
-    );
-
-    upgradeManager.registerUpgrade(
-      Upgrade(
-        id: 'score_multiplier',
-        name: 'Score Boost',
-        description: 'Increases score by 10%',
-        maxLevel: 10,
-        baseCost: 250,
-        costMultiplier: 1.5,
-        valuePerLevel: 0.1,
-      ),
-    );
-
-    upgradeManager.registerUpgrade(
-      Upgrade(
-        id: 'bonus_food',
-        name: 'Bonus Food',
-        description: 'Chance for bonus food',
-        maxLevel: 5,
-        baseCost: 400,
-        costMultiplier: 1.8,
-        valuePerLevel: 0.05,
-      ),
-    );
-    GetIt.I.registerSingleton(upgradeManager);
-  }
-
-  // 4. Achievement Manager
-  if (!GetIt.I.isRegistered<AchievementManager>()) {
-    final achievementManager = AchievementManager();
-    achievementManager.registerAchievement(
-      Achievement(
-        id: 'first_10',
-        title: 'Hungry Snake',
-        description: 'Eat 10 food',
-        iconAsset: 'assets/images/icon_food.png',
-      ),
-    );
-    achievementManager.registerAchievement(
-      Achievement(
-        id: 'snake_50',
-        title: 'Growing Big',
-        description: 'Score 50 points',
-        iconAsset: 'assets/images/icon_star.png',
-      ),
-    );
-    achievementManager.registerAchievement(
-      Achievement(
-        id: 'snake_100',
-        title: 'Giant Snake',
-        description: 'Score 100 points',
-        iconAsset: 'assets/images/icon_crown.png',
-      ),
-    );
-    achievementManager.registerAchievement(
-      Achievement(
-        id: 'hard_mode_30',
-        title: 'Obstacle Master',
-        description: 'Score 30 in Hard Mode',
-        iconAsset: 'assets/images/icon_flash.png',
-      ),
-    );
-    achievementManager.registerAchievement(
-      Achievement(
-        id: 'time_attack_50',
-        title: 'Speed Eater',
-        description: 'Score 50 in Time Attack',
-        iconAsset: 'assets/images/icon_timer.png',
-      ),
-    );
-
-    achievementManager.onAchievementUnlocked = (achievement) {
-      if (GetIt.I.isRegistered<SettingsManager>()) {
-        GetIt.I<SettingsManager>().triggerVibration(
-          intensity: VibrationIntensity.heavy,
-        );
-      }
-    };
-
-    GetIt.I.registerSingleton(achievementManager);
-  }
-
-  // 5. Prestige Manager
-  if (!GetIt.I.isRegistered<PrestigeManager>()) {
-    final prestigeManager = PrestigeManager();
-
-    prestigeManager.registerPrestigeUpgrade(
-      PrestigeUpgrade(
-        id: 'prestige_xp_boost',
-        name: 'XP Accelerator',
-        description: '+20% XP gain per level',
-        maxLevel: 10,
-        costPerLevel: 1,
-        bonusPerLevel: 0.2,
-      ),
-    );
-
-    prestigeManager.registerPrestigeUpgrade(
-      PrestigeUpgrade(
-        id: 'prestige_gold_boost',
-        name: 'Golden Scales',
-        description: '+15% gold income per level',
-        maxLevel: 10,
-        costPerLevel: 1,
-        bonusPerLevel: 0.15,
-      ),
-    );
-
-    prestigeManager.registerPrestigeUpgrade(
-      PrestigeUpgrade(
-        id: 'prestige_snake_slow',
-        name: 'Master Control',
-        description: '+5% slower speed per level',
-        maxLevel: 15,
-        costPerLevel: 2,
-        bonusPerLevel: 0.05,
-      ),
-    );
-
-    GetIt.I.registerSingleton(prestigeManager);
-
-    await prestigeManager.loadPrestigeData();
-    GetIt.I<ProgressionManager>().setPrestigeManager(prestigeManager);
-  }
-
-  // 6. Daily Quest Manager
-  if (!GetIt.I.isRegistered<DailyQuestManager>()) {
-    final questManager = DailyQuestManager();
-
-    questManager.registerQuest(
-      DailyQuest(
-        id: 'snake_play_5',
-        title: 'Daily Slitherer',
-        description: 'Play 5 games',
-        targetValue: 5,
-        goldReward: 100,
-        xpReward: 50,
-      ),
-    );
-
-    questManager.registerQuest(
-      DailyQuest(
-        id: 'snake_food_50',
-        title: 'Food Collector',
-        description: 'Eat 50 food total',
-        targetValue: 50,
-        goldReward: 130,
-        xpReward: 65,
-      ),
-    );
-
-    questManager.registerQuest(
-      DailyQuest(
-        id: 'snake_normal_30',
-        title: 'Normal Champion',
-        description: 'Score 30 in Normal mode',
-        targetValue: 30,
-        goldReward: 150,
-        xpReward: 75,
-      ),
-    );
-
-    questManager.registerQuest(
-      DailyQuest(
-        id: 'snake_hard_20',
-        title: 'Obstacle Dodger',
-        description: 'Score 20 in Hard mode',
-        targetValue: 20,
-        goldReward: 200,
-        xpReward: 100,
-      ),
-    );
-
-    questManager.registerQuest(
-      DailyQuest(
-        id: 'snake_time_30',
-        title: 'Time Attack Pro',
-        description: 'Score 30 in Time Attack',
-        targetValue: 30,
-        goldReward: 180,
-        xpReward: 90,
-      ),
-    );
-
-    GetIt.I.registerSingleton(questManager);
-
-    questManager.loadQuestData();
-    questManager.checkAndResetIfNeeded();
-  }
-
-  // 7. Weekly Challenge Manager
-  if (!GetIt.I.isRegistered<WeeklyChallengeManager>()) {
-    final challengeManager = WeeklyChallengeManager();
-
-    challengeManager.onChallengeCompleted = (challenge) {
-      if (GetIt.I.isRegistered<SettingsManager>()) {
-        GetIt.I<SettingsManager>().triggerVibration(
-          intensity: VibrationIntensity.heavy,
-        );
-      }
-    };
-
-    challengeManager.registerChallenge(
-      WeeklyChallenge(
-        id: 'weekly_snake_play_30',
-        title: 'Dedicated Slitherer',
-        description: 'Play 30 games',
-        targetValue: 30,
-        goldReward: 500,
-        xpReward: 250,
-        tier: ChallengeTier.bronze,
-      ),
-    );
-
-    challengeManager.registerChallenge(
-      WeeklyChallenge(
-        id: 'weekly_snake_food_500',
-        title: 'Food Hoarder',
-        description: 'Eat 500 food total',
-        targetValue: 500,
-        goldReward: 750,
-        xpReward: 400,
-        tier: ChallengeTier.silver,
-      ),
-    );
-
-    challengeManager.registerChallenge(
-      WeeklyChallenge(
-        id: 'weekly_snake_normal_100',
-        title: 'Normal Master',
-        description: 'Score 100 in Normal mode',
-        targetValue: 100,
-        goldReward: 1000,
-        xpReward: 500,
-        tier: ChallengeTier.silver,
-      ),
-    );
-
-    challengeManager.registerChallenge(
-      WeeklyChallenge(
-        id: 'weekly_snake_hard_50',
-        title: 'Hard Mode Champion',
-        description: 'Score 50 in Hard mode',
-        targetValue: 50,
-        goldReward: 1500,
-        xpReward: 800,
-        prestigePointReward: 1,
-        tier: ChallengeTier.gold,
-      ),
-    );
-
-    challengeManager.registerChallenge(
-      WeeklyChallenge(
-        id: 'weekly_snake_time_80',
-        title: 'Time Attack Legend',
-        description: 'Score 80 in Time Attack',
-        targetValue: 80,
-        goldReward: 1200,
-        xpReward: 600,
-        tier: ChallengeTier.gold,
-      ),
-    );
-
-    challengeManager.registerChallenge(
-      WeeklyChallenge(
-        id: 'weekly_snake_legend',
-        title: 'Snake Legend',
-        description: 'Score 150 in any mode',
-        targetValue: 150,
-        goldReward: 2000,
-        xpReward: 1000,
-        prestigePointReward: 2,
-        tier: ChallengeTier.platinum,
-      ),
-    );
-
-    GetIt.I.registerSingleton(challengeManager);
-
-    await challengeManager.loadChallengeData();
-    await challengeManager.checkAndResetIfNeeded();
-  }
-
-  // 8. Gold Manager
-  if (!GetIt.I.isRegistered<GoldManager>()) {
-    GetIt.I.registerSingleton(GoldManager());
-  }
-
-  // 8.5 Skin Manager
-  if (!GetIt.I.isRegistered<SkinManager>()) {
-    final skinManager = SkinManager();
-    GetIt.I.registerSingleton(skinManager);
-    await skinManager.load();
-  }
-
-  // 9. Settings Manager
-  if (!GetIt.I.isRegistered<SettingsManager>()) {
-    final settingsManager = SettingsManager();
-    GetIt.I.registerSingleton(settingsManager);
-
-    if (GetIt.I.isRegistered<AudioManager>()) {
-      settingsManager.setAudioManager(GetIt.I<AudioManager>());
-    }
-
-    await settingsManager.loadSettings();
-  }
-
-  // 10. Statistics Manager
-  if (!GetIt.I.isRegistered<StatisticsManager>()) {
-    final statisticsManager = StatisticsManager();
-    GetIt.I.registerSingleton(statisticsManager);
-  // Collection 시스템
-  if (!GetIt.I.isRegistered<CollectionManager>()) {
-    GetIt.I.registerSingleton(CollectionManager());
-  // ── Retention Systems for DailyHub ────────────────────────
-  //   if (!GetIt.I.isRegistered<LoginRewardsManager>()) {
-  //     GetIt.I.registerSingleton(LoginRewardsManager());
-  //   }
-  //   if (!GetIt.I.isRegistered<StreakManager>()) {
-  //     GetIt.I.registerSingleton(StreakManager());
-  //   }
-  //   if (!GetIt.I.isRegistered<DailyChallengeManager>()) {
-  //     GetIt.I.registerSingleton(DailyChallengeManager());
-  // }
-  //   // ── P3 Engine Systems ─────────────────────────────────────
-  //   if (!GetIt.I.isRegistered<GuildWarManager>()) {
-  //     GetIt.I.registerSingleton(GuildWarManager());
-  //   }
-  //   if (!GetIt.I.isRegistered<TournamentManager>()) {
-  //     GetIt.I.registerSingleton(TournamentManager());
-  //   }
-  //   if (!GetIt.I.isRegistered<SeasonalContentManager>()) {
-  //     GetIt.I.registerSingleton(SeasonalContentManager());
-  //   }
-    _registerCollections();
-  }
-
-    await statisticsManager.loadStats();
-    statisticsManager.startSession();
-  }
-
-  // 11. Save Manager
-  await SaveManagerHelper.setupSaveManager(
-    autoSaveEnabled: true,
-    autoSaveIntervalSeconds: 30,
-  );
-
-  await SaveManagerHelper.legacyLoadAll();
-}
-
-class SnakeGameApp extends StatelessWidget {
-  const SnakeGameApp({super.key});
+  static const gameId = 'MG-0009';
+  static const gameTitle = 'Hero Collection Card Puzzle';
+  static const coreFunLoop = kCoreFunLoop;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Snake Game',
+      title: gameTitle,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: MGColors.success,
+          seedColor: const Color(0xFF1E88E5),
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
       ),
       routes: {
-        '/daily-quest': (_) => const DailyQuestScreen(),
-        '/achievements': (_) => const AchievementScreen(),
-        '/daily-hub': (context) => DailyHubScreen(
-          questManager: GetIt.I<DailyQuestManager>(),
-          loginRewardsManager: GetIt.I<LoginRewardsManager>(),
-          streakManager: GetIt.I<StreakManager>(),
-          challengeManager: GetIt.I<DailyChallengeManager>(),
-          accentColor: MGColors.primaryAction,
-          onClose: () => Navigator.pop(context),
-        ),
-      
-        '/collection': (context) => CollectionScreen(
-          collectionManager: GetIt.I<CollectionManager>(),
-        ),
-        '/guild-war': (context) => GuildWarScreen(
-          guildWarManager: GetIt.I<GuildWarManager>(),
-          accentColor: MGColors.primaryAction,
-          onClose: () => Navigator.pop(context),
-          ),
-        '/tournament': (context) => TournamentScreen(
-          tournamentManager: GetIt.I<TournamentManager>(),
-          accentColor: MGColors.primaryAction,
-          onClose: () => Navigator.pop(context),
-          ),
-        '/seasonal-event': (context) => SeasonalEventScreen(
-          seasonalContentManager: GetIt.I<SeasonalContentManager>(),
-          accentColor: MGColors.primaryAction,
-          onClose: () => Navigator.pop(context),
-          ),
-},
-      home: const MainMenu(),
+        '/game': (_) => const GameScreen(),
+        '/engine': (_) => const FrameLoopScreen(),
+        '/levels': (_) => const LevelRoadmapScreen(),
+        '/daily': (_) => const DailyHubScreen(),
+        '/retention': (_) => const RetentionHubScreen(),
+        '/guild-war': (_) => const GuildWarScreen(),
+        '/tournament': (_) => const TournamentScreen(),
+        '/seasonal-event': (_) => const SeasonalEventScreen(),
+      },
+      home: const MainMenuScreen(),
     );
   }
 }
 
-void _registerCollections() {
-  final collection = GetIt.I<CollectionManager>();
+class MainMenuScreen extends StatelessWidget {
+  const MainMenuScreen({super.key});
 
-  // Characters 컬렉션
-  collection.registerCollection(Collection(
-    id: 'characters',
-    name: '캐릭터',
-    description: '모든 캐릭터를 수집하세요',
-    items: [
-      const CollectionItem(
-        id: 'char_warrior',
-        name: '전사',
-        description: '강인한 근접 전투 캐릭터',
-        rarity: CollectionRarity.common,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Icon(Icons.videogame_asset_rounded, size: 72),
+                  const SizedBox(height: 24),
+                  Text(
+                    MyApp.gameId,
+                    key: const ValueKey('game-id'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    MyApp.gameTitle,
+                    key: const ValueKey('game-title'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Core Fun: ${MyApp.coreFunLoop}',
+                    key: const ValueKey('core-fun-loop'),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  FilledButton.icon(
+                    key: const ValueKey('start-game'),
+                    onPressed: () => Navigator.of(context).pushNamed('/game'),
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: const Text('Start Game'),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    key: const ValueKey('level-roadmap'),
+                    onPressed: () => Navigator.of(context).pushNamed('/levels'),
+                    icon: const Icon(Icons.map_rounded),
+                    label: const Text('Level Roadmap'),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: const [
+                      _MenuAction(
+                        route: '/engine',
+                        buttonKey: ValueKey('engine-loop'),
+                        icon: Icons.memory_rounded,
+                        label: 'Engine',
+                      ),
+                      _MenuAction(
+                        route: '/retention',
+                        buttonKey: ValueKey('rewards'),
+                        icon: Icons.card_giftcard_rounded,
+                        label: 'Rewards',
+                      ),
+                      _MenuAction(
+                        route: '/daily',
+                        buttonKey: ValueKey('daily-quests'),
+                        icon: Icons.today_rounded,
+                        label: 'Daily',
+                      ),
+                      _MenuAction(
+                        route: '/guild-war',
+                        buttonKey: ValueKey('guild-war'),
+                        icon: Icons.groups_rounded,
+                        label: 'Guild',
+                      ),
+                      _MenuAction(
+                        route: '/tournament',
+                        buttonKey: ValueKey('tournament'),
+                        icon: Icons.emoji_events_rounded,
+                        label: 'Tournament',
+                      ),
+                      _MenuAction(
+                        route: '/seasonal-event',
+                        buttonKey: ValueKey('seasonal-event'),
+                        icon: Icons.event_rounded,
+                        label: 'Event',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
-      const CollectionItem(
-        id: 'char_mage',
-        name: '마법사',
-        description: '강력한 마법 공격 캐릭터',
-        rarity: CollectionRarity.rare,
-      ),
-      const CollectionItem(
-        id: 'char_archer',
-        name: '궁수',
-        description: '원거리 정밀 공격 캐릭터',
-        rarity: CollectionRarity.rare,
-      ),
-      const CollectionItem(
-        id: 'char_assassin',
-        name: '암살자',
-        description: '치명적인 은신 공격 캐릭터',
-        rarity: CollectionRarity.epic,
-      ),
-      const CollectionItem(
-        id: 'char_healer',
-        name: '힐러',
-        description: '팀을 치유하는 지원 캐릭터',
-        rarity: CollectionRarity.legendary,
-      ),
-    ],
-    completionReward: const CollectionReward(type: RewardType.gold, amount: 10000),
-    milestoneRewards: {
-      25: const CollectionReward(type: RewardType.gold, amount: 1000),
-      50: const CollectionReward(type: RewardType.gold, amount: 3000),
-      75: const CollectionReward(type: RewardType.gold, amount: 5000),
-    },
-  ));
+    );
+  }
+}
 
-  // 아이템 해제 콜백 (햅틱 피드백)
-  collection.onItemUnlocked = (collectionId, itemId) {
-    // SettingsManager가 등록되어 있으면 햅틱 피드백
-    debugPrint('Collection item unlocked: $collectionId / $itemId');
-  };
+class _MenuAction extends StatelessWidget {
+  const _MenuAction({
+    required this.route,
+    required this.buttonKey,
+    required this.icon,
+    required this.label,
+  });
+
+  final String route;
+  final ValueKey<String> buttonKey;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 132,
+      child: OutlinedButton.icon(
+        key: buttonKey,
+        onPressed: () => Navigator.of(context).pushNamed(route),
+        icon: Icon(icon),
+        label: Text(label),
+      ),
+    );
+  }
+}
+
+class GameScreen extends StatefulWidget {
+  const GameScreen({super.key});
+
+  @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  int levelIndex = 0;
+  int goldBank = 0;
+  int xpBank = 0;
+
+  GameLevelDesign get currentLevel => kLevelDesign[levelIndex];
+
+  void completeAction() {
+    setState(() {
+      goldBank += currentLevel.goldReward;
+      xpBank += currentLevel.xpReward;
+      if (levelIndex < kLevelDesign.length - 1) {
+        levelIndex += 1;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final level = currentLevel;
+    final spawn = kWaveSpawnTable[levelIndex];
+    return Scaffold(
+      appBar: AppBar(title: const Text('Game Ready')),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Primary loop: ${MyApp.coreFunLoop}',
+                  key: const ValueKey('primary-loop'),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Level ${level.levelIndex} - ${level.stage}',
+                  key: const ValueKey('level-name'),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Objective: ${level.objective}',
+                  key: const ValueKey('level-objective'),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Wave ${level.wave} | Difficulty ${level.difficulty.toStringAsFixed(2)}',
+                  key: const ValueKey('difficulty-label'),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Pressure: ${spawn.enemyCount} enemies every '
+                  '${spawn.spawnCadenceSeconds.toStringAsFixed(2)}s',
+                  key: const ValueKey('pressure-label'),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                LinearProgressIndicator(
+                  value: (level.levelIndex / kLevelDesign.length).clamp(0.0, 1.0),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Reward bank: $goldBank gold / $xpBank xp',
+                  key: const ValueKey('reward-bank'),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                FilledButton.icon(
+                  key: const ValueKey('complete-action'),
+                  onPressed: completeAction,
+                  icon: const Icon(Icons.check_circle_rounded),
+                  label: const Text('Complete Action'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FrameLoopGame extends FlameGame {
+  double elapsedSeconds = 0;
+  int frameTicks = 0;
+
+  @override
+  void update(double dt) {
+    elapsedSeconds += dt;
+    frameTicks += 1;
+    super.update(dt);
+  }
+}
+
+class FrameLoopScreen extends StatelessWidget {
+  const FrameLoopScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Engine Loop')),
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'GameWidget frame loop is active for runtime input, update, and render validation.',
+              key: ValueKey('engine-loop-status'),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(child: GameWidget(game: _FrameLoopGame())),
+        ],
+      ),
+    );
+  }
+}
+
+class LevelRoadmapScreen extends StatelessWidget {
+  const LevelRoadmapScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Level Roadmap')),
+      body: ListView.builder(
+        key: const ValueKey('level-list'),
+        padding: const EdgeInsets.all(16),
+        itemCount: kLevelDesign.length,
+        itemBuilder: (context, index) {
+          final level = kLevelDesign[index];
+          final spawn = kWaveSpawnTable[index];
+          return ListTile(
+            leading: CircleAvatar(child: Text('${level.levelIndex}')),
+            title: Text('Level ${level.levelIndex} - ${level.stage}'),
+            subtitle: Text(
+              'Wave ${level.wave} | difficulty ${level.difficulty.toStringAsFixed(2)} | '
+              '${spawn.enemyCount} enemies | reward ${level.goldReward}g/${level.xpReward}xp',
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class DailyHubScreen extends StatelessWidget {
+  const DailyHubScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SimpleScreen(
+      title: 'Daily Quests',
+      detail: 'Short goals keep the fun loop moving.',
+      icon: Icons.today_rounded,
+    );
+  }
+}
+
+class RetentionHubScreen extends StatelessWidget {
+  const RetentionHubScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SimpleScreen(
+      title: 'Rewards',
+      detail: 'Progression loop: return, claim, improve.',
+      icon: Icons.card_giftcard_rounded,
+    );
+  }
+}
+
+class GuildWarScreen extends StatelessWidget {
+  const GuildWarScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SimpleScreen(
+      title: 'Guild War',
+      detail: 'Social competition is reachable from the main loop.',
+      icon: Icons.groups_rounded,
+    );
+  }
+}
+
+class TournamentScreen extends StatelessWidget {
+  const TournamentScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SimpleScreen(
+      title: 'Tournament',
+      detail: 'Competitive goals are available for mastery.',
+      icon: Icons.emoji_events_rounded,
+    );
+  }
+}
+
+class SeasonalEventScreen extends StatelessWidget {
+  const SeasonalEventScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SimpleScreen(
+      title: 'Seasonal Event',
+      detail: 'Timed content gives the loop a fresh reason to return.',
+      icon: Icons.event_rounded,
+    );
+  }
+}
+
+class _SimpleScreen extends StatelessWidget {
+  const _SimpleScreen({required this.title, required this.detail, required this.icon});
+
+  final String title;
+  final String detail;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 56),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                key: const ValueKey('screen-title'),
+                style: Theme.of(context).textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(detail, key: const ValueKey('screen-detail'), textAlign: TextAlign.center),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
