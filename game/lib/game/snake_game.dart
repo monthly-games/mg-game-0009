@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flame/game.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ import 'package:mg_common_game/core/ui/theme/mg_colors.dart';
 
 enum Direction { up, down, left, right }
 
-enum SnakeGameMode { normal, hard, timeAttack }
+enum SnakeGameMode { normal, hard, timeAttack, battle }
 
 class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
   final SnakeGameMode mode;
@@ -33,13 +34,20 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
   // Mode-based settings
   double get moveInterval {
+    // Speed boost effect overrides
+    if (activeEffect == FoodType.speedBoost) {
+      return baseMoveInterval * 0.6;
+    }
+
     switch (mode) {
       case SnakeGameMode.hard:
         return 0.08;
       case SnakeGameMode.timeAttack:
         return 0.12;
+      case SnakeGameMode.battle:
+        return 0.13;
       case SnakeGameMode.normal:
-        return 0.15;
+        return baseMoveInterval;
     }
   }
 
@@ -56,6 +64,24 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
   // Time Attack logic
   double remainingTime = 60.0;
+
+  // Special food system
+  FoodType currentFoodType = FoodType.normal;
+  FoodType? activeEffect;
+  Timer? effectTimer;
+  double baseMoveInterval = 0.15;
+  bool get isGhostMode => activeEffect == FoodType.ghostMode;
+  bool get isInvincible => activeEffect == FoodType.invincibility;
+  bool get isDoublePoints => activeEffect == FoodType.doublePoints;
+
+  // Battle mode
+  List<Vector2> opponentSnake = [];
+  Direction opponentDirection = Direction.right;
+  Vector2 opponentFood = Vector2.zero();
+  int opponentScore = 0;
+  List<Vector2> obstacles = [];
+  Timer? opponentMoveTimer;
+  static const double opponentMoveInterval = 0.2;
 
   @override
   bool paused = false;
@@ -114,7 +140,95 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     isNewRecord = false;
     moveTimer = 0;
 
+    // Reset special food effects
+    effectTimer?.cancel();
+    activeEffect = null;
+    currentFoodType = FoodType.normal;
+    baseMoveInterval = mode == SnakeGameMode.hard ? 0.08 :
+                      mode == SnakeGameMode.timeAttack ? 0.12 : 0.15;
+
+    // Battle mode initialization
+    if (mode == SnakeGameMode.battle) {
+      _initializeBattleMode();
+    }
+
     _spawnFood();
+  }
+
+  void _initializeBattleMode() {
+    // Opponent snake starts from opposite side
+    opponentSnake = [
+      Vector2(gridSize / 2 + 5, gridSize / 2),
+      Vector2(gridSize / 2 + 6, gridSize / 2),
+      Vector2(gridSize / 2 + 7, gridSize / 2),
+    ];
+    opponentDirection = Direction.left;
+    opponentScore = 0;
+
+    // Spawn obstacles (5 random obstacles)
+    obstacles.clear();
+    for (int i = 0; i < 5; i++) {
+      bool validPosition = false;
+      Vector2 obsPos;
+      while (!validPosition) {
+        obsPos = Vector2(
+          (Vector2.random().x * gridSize).floor().toDouble(),
+          (Vector2.random().y * gridSize).floor().toDouble(),
+        );
+
+        // Check not overlapping with either snake
+        validPosition = !snake.any((seg) => seg == obsPos) &&
+                       !opponentSnake.any((seg) => seg == obsPos) &&
+                       !obstacles.any((obs) => obs == obsPos);
+      }
+      obstacles.add(obsPos);
+    }
+
+    _spawnOpponentFood();
+  }
+
+  void _spawnOpponentFood() {
+    bool validPosition = false;
+    while (!validPosition) {
+      opponentFood = Vector2(
+        (Vector2.random().x * gridSize).floor().toDouble(),
+        (Vector2.random().y * gridSize).floor().toDouble(),
+      );
+
+      validPosition = !snake.any((seg) => seg == opponentFood) &&
+                     !opponentSnake.any((seg) => seg == opponentFood) &&
+                     !obstacles.any((obs) => obs == opponentFood);
+    }
+  }
+
+  void _activateSpecialEffect(FoodType type) {
+    if (!type.isSpecial) return;
+
+    // Cancel previous effect timer
+    effectTimer?.cancel();
+
+    activeEffect = type;
+    _audioManager.playSfx('powerup.wav');
+
+    // Schedule effect end
+    if (type.duration != null) {
+      effectTimer = Timer(type.duration!, () {
+        activeEffect = null;
+        effectTimer = null;
+      });
+    }
+
+    // Add visual effect
+    final head = snake.first;
+    final boardSize = gridSize * cellSize;
+    final offsetX = (size.x - boardSize) / 2;
+    final offsetY = (size.y - boardSize) / 2;
+    final headPixelPos = Vector2(
+      offsetX + head.x * cellSize + cellSize / 2,
+      offsetY + head.y * cellSize + cellSize / 2,
+    );
+
+    add(PowerUpParticleEffect(position: headPixelPos, type: type));
   }
 
   void _spawnFood() {
@@ -128,6 +242,29 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
       // Check if food doesn't overlap with snake
       validPosition = !snake.any((segment) => segment == food);
+
+      // Battle mode: check obstacles
+      if (mode == SnakeGameMode.battle) {
+        validPosition = validPosition && !obstacles.any((obs) => obs == food);
+      }
+    }
+
+    // Determine food type (10% chance for special food in normal modes)
+    if (mode != SnakeGameMode.battle) {
+      final rand = Vector2.random().x;
+      if (rand < 0.03) {
+        currentFoodType = FoodType.speedBoost;
+      } else if (rand < 0.06) {
+        currentFoodType = FoodType.ghostMode;
+      } else if (rand < 0.08) {
+        currentFoodType = FoodType.doublePoints;
+      } else if (rand < 0.10) {
+        currentFoodType = FoodType.invincibility;
+      } else {
+        currentFoodType = FoodType.normal;
+      }
+    } else {
+      currentFoodType = FoodType.normal;
     }
   }
 
@@ -177,19 +314,54 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
         break;
     }
 
-    // Wall collision check
+    // Wall collision check (ghost mode can pass through walls)
     if (newHead.x < 0 ||
         newHead.x >= gridSize ||
         newHead.y < 0 ||
         newHead.y >= gridSize) {
-      _endGame();
-      return;
+      if (isGhostMode) {
+        // Wrap around
+        if (newHead.x < 0) newHead = Vector2(gridSize - 1, newHead.y);
+        if (newHead.x >= gridSize) newHead = Vector2(0, newHead.y);
+        if (newHead.y < 0) newHead = Vector2(newHead.x, gridSize - 1);
+        if (newHead.y >= gridSize) newHead = Vector2(newHead.x, 0);
+      } else {
+        _endGame();
+        return;
+      }
     }
 
-    // Self collision check
+    // Self collision check (ghost mode and invincibility can pass through self)
     if (snake.any((segment) => segment == newHead)) {
-      _endGame();
-      return;
+      if (!isGhostMode && !isInvincible) {
+        _endGame();
+        return;
+      }
+    }
+
+    // Battle mode: collision with opponent
+    if (mode == SnakeGameMode.battle) {
+      // Head-to-head collision = both lose
+      if (opponentSnake.first == newHead) {
+        _endBattleMode(draw: true);
+        return;
+      }
+
+      // Head hits opponent body = opponent wins
+      if (opponentSnake.any((seg) => seg == newHead)) {
+        if (!isInvincible) {
+          _endBattleMode(playerWon: false);
+          return;
+        }
+      }
+
+      // Collision with obstacles
+      if (obstacles.any((obs) => obs == newHead)) {
+        if (!isInvincible) {
+          _endBattleMode(playerWon: false);
+          return;
+        }
+      }
     }
 
     // Add new head
@@ -197,7 +369,10 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
 
     // Check if food eaten
     if (newHead == food) {
-      score++;
+      // Calculate points (consider double points effect)
+      final points = currentFoodType.points * (isDoublePoints ? 2 : 1);
+      score += points;
+
       _audioManager.playSfx('eat.wav');
 
       // Add visual effects for eating food
@@ -210,13 +385,23 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       );
 
       add(FoodParticleEffect(position: foodPixelPos));
-      add(ScorePopup(position: foodPixelPos, points: 1));
+      add(ScorePopup(position: foodPixelPos, points: points));
+
+      // Activate special effect if applicable
+      if (currentFoodType.isSpecial) {
+        _activateSpecialEffect(currentFoodType);
+      }
 
       _spawnFood();
       // Don't remove tail (snake grows)
     } else {
       // Remove tail (maintain length)
       snake.removeLast();
+    }
+
+    // Battle mode: opponent AI
+    if (mode == SnakeGameMode.battle) {
+      _updateOpponent();
     }
   }
 
@@ -250,6 +435,142 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     }
 
     onGameOver?.call();
+  }
+
+  void _updateOpponent() {
+    // Simple AI: move towards food while avoiding collisions
+    final head = opponentSnake.first;
+    Vector2 targetFood = opponentFood;
+
+    // Occasionally target player's food for competitive play
+    if (Vector2.random().x < 0.3) {
+      targetFood = food;
+    }
+
+    // Determine best direction (simplified pathfinding)
+    Direction bestDirection = opponentDirection;
+    double bestDistance = double.infinity;
+
+    for (final dir in Direction.values) {
+      // Prevent 180 degree turns
+      if ((dir == Direction.up && opponentDirection == Direction.down) ||
+          (dir == Direction.down && opponentDirection == Direction.up) ||
+          (dir == Direction.left && opponentDirection == Direction.right) ||
+          (dir == Direction.right && opponentDirection == Direction.left)) {
+        continue;
+      }
+
+      Vector2 newHead;
+      switch (dir) {
+        case Direction.up:
+          newHead = Vector2(head.x, head.y - 1);
+          break;
+        case Direction.down:
+          newHead = Vector2(head.x, head.y + 1);
+          break;
+        case Direction.left:
+          newHead = Vector2(head.x - 1, head.y);
+          break;
+        case Direction.right:
+          newHead = Vector2(head.x + 1, head.y);
+          break;
+      }
+
+      // Check if valid move
+      bool valid = newHead.x >= 0 && newHead.x < gridSize &&
+                   newHead.y >= 0 && newHead.y < gridSize;
+      valid = valid && !opponentSnake.any((seg) => seg == newHead);
+      valid = valid && !obstacles.any((obs) => obs == newHead);
+
+      if (valid) {
+        final distance = (newHead - targetFood).length;
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestDirection = dir;
+        }
+      }
+    }
+
+    opponentDirection = bestDirection;
+
+    // Move opponent
+    Vector2 newOpponentHead;
+    switch (opponentDirection) {
+      case Direction.up:
+        newOpponentHead = Vector2(head.x, head.y - 1);
+        break;
+      case Direction.down:
+        newOpponentHead = Vector2(head.x, head.y + 1);
+        break;
+      case Direction.left:
+        newOpponentHead = Vector2(head.x - 1, head.y);
+        break;
+      case Direction.right:
+        newOpponentHead = Vector2(head.x + 1, head.y);
+        break;
+    }
+
+    opponentSnake.insert(0, newOpponentHead);
+
+    // Check if opponent ate food
+    if (newOpponentHead == opponentFood) {
+      opponentScore++;
+      _spawnOpponentFood();
+    } else if (newOpponentHead == food) {
+      opponentScore += 2; // Bonus for stealing player's food
+      _spawnFood();
+    } else {
+      opponentSnake.removeLast();
+    }
+
+    // Check opponent collision with player
+    if (newOpponentHead == snake.first) {
+      _endBattleMode(playerWon: true);
+      return;
+    }
+
+    if (snake.any((seg) => seg == newOpponentHead)) {
+      // Opponent hit player body - player wins
+      _endBattleMode(playerWon: true);
+      return;
+    }
+
+    // Win condition: first to 15 points
+    if (score >= 15) {
+      _endBattleMode(playerWon: true);
+      return;
+    }
+    if (opponentScore >= 15) {
+      _endBattleMode(playerWon: false);
+      return;
+    }
+  }
+
+  void _endBattleMode({bool? playerWon, bool? draw}) {
+    if (gameOver) return;
+    gameOver = true;
+
+    _audioManager.playSfx('collision.wav');
+
+    // Store result for overlay to display
+    if (draw == true) {
+      score = -1; // Special code for draw
+    } else if (playerWon == false) {
+      score = -2; // Special code for loss
+    }
+
+    onGameOver?.call();
+  }
+
+  @override
+  void lifecycleStateChange(AppLifecycleState state) {
+    super.lifecycleStateChange(state);
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      // Cleanup timers when app goes to background
+      effectTimer?.cancel();
+    }
   }
 
   void restart() {
@@ -384,6 +705,11 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     // Draw snake
     _drawSnake(canvas, offsetX, offsetY);
 
+    // Battle mode: draw opponent and obstacles
+    if (mode == SnakeGameMode.battle) {
+      _drawBattleElements(canvas, offsetX, offsetY);
+    }
+
     // Draw UI text
     _drawUI(canvas);
   }
@@ -410,7 +736,34 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
   }
 
   void _drawFood(Canvas canvas, double offsetX, double offsetY) {
-    if (_foodSpriteSheet != null) {
+    // Determine color based on food type
+    Color foodColor;
+    if (currentFoodType.isSpecial) {
+      foodColor = currentFoodType.color;
+    } else {
+      switch (_skinManager.currentFoodSkin) {
+        case FoodSkin.apple:
+          foodColor = MGColors.error;
+          break;
+        case FoodSkin.mouse:
+          foodColor = MGColors.common;
+          break;
+        case FoodSkin.burger:
+          foodColor = MGColors.warning;
+          break;
+        case FoodSkin.diamond:
+          foodColor = MGColors.energy;
+          break;
+        case FoodSkin.coin:
+          foodColor = MGColors.gold;
+          break;
+        case FoodSkin.potion:
+          foodColor = MGColors.gem;
+          break;
+      }
+    }
+
+    if (_foodSpriteSheet != null && !currentFoodType.isSpecial) {
       final spriteIndex = _skinManager.currentFoodSkin.spriteIndex;
       final sprite = _foodSpriteSheet!.getSprite(0, spriteIndex);
 
@@ -425,29 +778,7 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       return;
     }
 
-    // Fallback logic
-    Color foodColor = MGColors.error;
-    switch (_skinManager.currentFoodSkin) {
-      case FoodSkin.apple:
-        foodColor = MGColors.error;
-        break;
-      case FoodSkin.mouse:
-        foodColor = MGColors.common;
-        break;
-      case FoodSkin.burger:
-        foodColor = MGColors.warning;
-        break;
-      case FoodSkin.diamond:
-        foodColor = MGColors.energy;
-        break;
-      case FoodSkin.coin:
-        foodColor = MGColors.gold;
-        break;
-      case FoodSkin.potion:
-        foodColor = MGColors.gem;
-        break;
-    }
-
+    // Fallback logic and special food rendering
     final paint = Paint()..color = foodColor;
 
     final rect = Rect.fromLTWH(
@@ -457,7 +788,130 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
       cellSize - 4,
     );
 
-    canvas.drawOval(rect, paint);
+    // Different shapes for special food
+    if (currentFoodType == FoodType.invincibility) {
+      // Star shape for invincibility
+      _drawStar(canvas, rect.center, cellSize / 2 - 2, foodColor);
+    } else if (currentFoodType.isSpecial) {
+      // Diamond shape for other special food
+      final path = Path();
+      final center = rect.center;
+      final size = cellSize / 2 - 2;
+      path.moveTo(center.dx, center.dy - size);
+      path.lineTo(center.dx + size, center.dy);
+      path.lineTo(center.dx, center.dy + size);
+      path.lineTo(center.dx - size, center.dy);
+      path.close();
+      canvas.drawPath(path, paint);
+    } else {
+      canvas.drawOval(rect, paint);
+    }
+  }
+
+  void _drawStar(Canvas canvas, Offset center, double radius, Color color) {
+    final paint = Paint()..color = color;
+    final path = Path();
+
+    for (int i = 0; i < 5; i++) {
+      final angle = (i * 4 * 3.14159) / 5 - 3.14159 / 2;
+      final x = center.dx + radius * cos(angle);
+      final y = center.dy + radius * sin(angle);
+
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  void _drawBattleElements(Canvas canvas, double offsetX, double offsetY) {
+    // Draw opponent snake
+    final opponentPaint = Paint()
+      ..color = MGColors.error
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < opponentSnake.length; i++) {
+      final segment = opponentSnake[i];
+      final isHead = i == 0;
+
+      opponentPaint.color = isHead
+          ? MGColors.error
+          : MGColors.error.withValues(alpha: 0.6);
+
+      final rect = Rect.fromLTWH(
+        offsetX + segment.x * cellSize + 1,
+        offsetY + segment.y * cellSize + 1,
+        cellSize - 2,
+        cellSize - 2,
+      );
+
+      canvas.drawRect(rect, opponentPaint);
+
+      // Mark opponent head
+      if (isHead) {
+        final eyePaint = Paint()..color = MGColors.textHighEmphasis;
+        canvas.drawCircle(
+          Offset(
+            offsetX + segment.x * cellSize + cellSize / 3,
+            offsetY + segment.y * cellSize + cellSize / 3,
+          ),
+          cellSize / 10,
+          eyePaint,
+        );
+        canvas.drawCircle(
+          Offset(
+            offsetX + segment.x * cellSize + 2 * cellSize / 3,
+            offsetY + segment.y * cellSize + cellSize / 3,
+          ),
+          cellSize / 10,
+          eyePaint,
+        );
+      }
+    }
+
+    // Draw obstacles
+    final obstaclePaint = Paint()
+      ..color = MGColors.cardDark
+      ..style = PaintingStyle.fill;
+
+    for (final obs in obstacles) {
+      final rect = Rect.fromLTWH(
+        offsetX + obs.x * cellSize + 1,
+        offsetY + obs.y * cellSize + 1,
+        cellSize - 2,
+        cellSize - 2,
+      );
+
+      // Draw X pattern
+      canvas.drawRect(rect, obstaclePaint);
+      final linePaint = Paint()
+        ..color = MGColors.textDisabled
+        ..strokeWidth = 2;
+      canvas.drawLine(
+        Offset(rect.left, rect.top),
+        Offset(rect.right, rect.bottom),
+        linePaint,
+      );
+      canvas.drawLine(
+        Offset(rect.right, rect.top),
+        Offset(rect.left, rect.bottom),
+        linePaint,
+      );
+    }
+
+    // Draw opponent food
+    final oppFoodPaint = Paint()..color = MGColors.warning;
+    final oppFoodRect = Rect.fromLTWH(
+      offsetX + opponentFood.x * cellSize + 4,
+      offsetY + opponentFood.y * cellSize + 4,
+      cellSize - 8,
+      cellSize - 8,
+    );
+    canvas.drawOval(oppFoodRect, oppFoodPaint);
   }
 
   void _drawSnake(Canvas canvas, double offsetX, double offsetY) {
@@ -601,6 +1055,56 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
     // 점수 표시
     textPaint.render(canvas, 'Score: $score', Vector2(20, 20));
 
+    // Battle mode: show opponent score
+    if (mode == SnakeGameMode.battle) {
+      final oppScorePaint = TextPaint(
+        style: const TextStyle(
+          color: MGColors.error,
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+      oppScorePaint.render(
+        canvas,
+        'AI: $opponentScore',
+        Vector2(size.x - 150, 20),
+      );
+
+      // Target score indicator
+      final targetPaint = TextPaint(
+        style: const TextStyle(
+          color: MGColors.textDisabled,
+          fontSize: 20,
+        ),
+      );
+      targetPaint.render(
+        canvas,
+        'Target: 15',
+        Vector2(size.x / 2 - 50, 20),
+      );
+    }
+
+    // Active effect indicator
+    if (activeEffect != null && effectTimer != null) {
+      final effectPaint = TextPaint(
+        style: TextStyle(
+          color: activeEffect!.color,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          shadows: const [
+            Shadow(offset: Offset(1, 1), blurRadius: 2, color: MGColors.backgroundDark),
+          ],
+        ),
+      );
+
+      final remainingSeconds = (effectTimer!.tick ?? 0) / 1000;
+      effectPaint.render(
+        canvas,
+        '${activeEffect!.name}: ${remainingSeconds.toStringAsFixed(1)}s',
+        Vector2(20, 60),
+      );
+    }
+
     // Time Attack Timer Render
     if (mode == SnakeGameMode.timeAttack) {
       final timerPaint = TextPaint(
@@ -631,9 +1135,13 @@ class SnakeGame extends FlameGame with KeyboardEvents, DragCallbacks {
         style: const TextStyle(color: MGColors.textHighEmphasis, fontSize: 32),
       );
 
+      final startMessage = mode == SnakeGameMode.battle
+          ? 'Battle Mode! Tap to start'
+          : 'Tap or press key to start';
+
       startPaint.render(
         canvas,
-        'Tap or press key to start',
+        startMessage,
         Vector2(size.x / 2 - 220, size.y / 2),
       );
     }

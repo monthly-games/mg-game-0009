@@ -12,6 +12,7 @@ class GameOverOverlay extends StatefulWidget {
   final bool isNewRecord;
   final VoidCallback onRestart;
   final VoidCallback onMainMenu;
+  final String? battleResult; // 'win', 'lose', 'draw'
 
   const GameOverOverlay({
     super.key,
@@ -20,6 +21,7 @@ class GameOverOverlay extends StatefulWidget {
     required this.isNewRecord,
     required this.onRestart,
     required this.onMainMenu,
+    this.battleResult,
   });
 
   @override
@@ -47,7 +49,14 @@ class _GameOverOverlayState extends State<GameOverOverlay>
 
     // Reward Logic: 1 Gold per 1 Score? Or 10 Score?
     // Let's make it 1 Gold per 1 Score for now to be generous.
-    _goldEarned = widget.score;
+    // Battle mode: wins give bonus gold
+    if (widget.battleResult == 'win') {
+      _goldEarned = widget.score > 0 ? widget.score + 10 : 10; // Bonus win gold
+    } else if (widget.battleResult == 'lose' || widget.battleResult == 'draw') {
+      _goldEarned = widget.score > 0 ? widget.score : 2; // Consolation gold
+    } else {
+      _goldEarned = widget.score;
+    }
 
     // Add Gold
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -87,10 +96,10 @@ class _GameOverOverlayState extends State<GameOverOverlay>
             mainAxisSize: MainAxisSize.min,
             children: [
               // Title
-              const Text(
-                'GAME OVER',
+              Text(
+                _getGameTitle(),
                 style: TextStyle(
-                  color: Colors.redAccent,
+                  color: _getTitleColor(),
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
@@ -99,13 +108,17 @@ class _GameOverOverlayState extends State<GameOverOverlay>
               const SizedBox(height: MGSpacing.lg),
 
               // Scores
-              _buildScoreRow('Score', '${widget.score}'),
+              if (widget.battleResult != null)
+                _buildBattleResult(),
+              if (widget.battleResult == null)
+                _buildScoreRow('Score', '${widget.score}'),
               const SizedBox(height: MGSpacing.sm),
-              _buildScoreRow(
-                'Best',
-                '${widget.highScore}',
-                isNewRecord: widget.isNewRecord,
-              ),
+              if (widget.battleResult == null)
+                _buildScoreRow(
+                  'Best',
+                  '${widget.highScore}',
+                  isNewRecord: widget.isNewRecord,
+                ),
 
               const SizedBox(height: MGSpacing.lg),
 
@@ -254,6 +267,73 @@ class _GameOverOverlayState extends State<GameOverOverlay>
           ),
         ),
       ),
+    );
+  }
+
+  String _getGameTitle() {
+    if (widget.battleResult == 'win') return 'VICTORY!';
+    if (widget.battleResult == 'lose') return 'DEFEAT';
+    if (widget.battleResult == 'draw') return 'DRAW';
+    return 'GAME OVER';
+  }
+
+  Color _getTitleColor() {
+    if (widget.battleResult == 'win') return MGColors.success;
+    if (widget.battleResult == 'lose') return MGColors.error;
+    if (widget.battleResult == 'draw') return MGColors.warning;
+    return Colors.redAccent;
+  }
+
+  Widget _buildBattleResult() {
+    String resultText;
+    Color resultColor;
+    String description;
+
+    switch (widget.battleResult) {
+      case 'win':
+        resultText = '🏆 승리!';
+        resultColor = MGColors.success;
+        description = 'AI 뱀을 물리쳤습니다!';
+        break;
+      case 'lose':
+        resultText = '💀 패배';
+        resultColor = MGColors.error;
+        description = 'AI 뱀이 이겼습니다.';
+        break;
+      case 'draw':
+        resultText = '🤝 무승부';
+        resultColor = MGColors.warning;
+        description = '동시에 충돌했습니다!';
+        break;
+      default:
+        resultText = '게임 종료';
+        resultColor = MGColors.textHighEmphasis;
+        description = '';
+    }
+
+    return Column(
+      children: [
+        Text(
+          resultText,
+          style: TextStyle(
+            color: resultColor,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        if (description.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              description,
+              style: const TextStyle(
+                color: MGColors.textMediumEmphasis,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+      ],
     );
   }
 }

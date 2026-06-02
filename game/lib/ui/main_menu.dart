@@ -132,6 +132,17 @@ class _MainMenuState extends State<MainMenu> {
                             SnakeGameMode.timeAttack.name,
                           ),
                         ),
+                        GameModeCard(
+                          title: '배틀 모드',
+                          description: 'AI 뱀과 1대1 대결! 먼저 15점 달성!',
+                          icon: Icons.sports_martial_arts,
+                          color: Colors.purpleAccent,
+                          onTap: () =>
+                              _startGame(context, SnakeGameMode.battle),
+                          highScoreFuture: HighScoreManager.getHighScore(
+                            SnakeGameMode.battle.name,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -355,6 +366,7 @@ class _MainMenuState extends State<MainMenu> {
             SizedBox(height: 8),
             Text('일반/어려움: 먹이를 먹고 성장하세요'),
             Text('타임 어택: 60초 안에 최고 점수!'),
+            Text('배틀 모드: AI와 경쟁하여 먼저 15점 달성!'),
             SizedBox(height: 16),
             Text(
               '⚠️ 게임 오버',
@@ -421,7 +433,7 @@ class _MainMenuState extends State<MainMenu> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => DailyQuestScreen(
-          questManager: GetIt.I<DailyQuestManager>(),
+          questManager: GetIt.I<DailyQuestManagerV2>(),
           title: '일일 퀘스트',
           accentColor: MGColors.success,
           onClaimReward: (questId, goldReward, xpReward) {
@@ -468,7 +480,7 @@ class _MainMenuState extends State<MainMenu> {
           statisticsManager: GetIt.I<StatisticsManager>(),
           progressionManager: GetIt.I<ProgressionManager>(),
           prestigeManager: GetIt.I<PrestigeManager>(),
-          questManager: GetIt.I<DailyQuestManager>(),
+          questManager: GetIt.I<DailyQuestManagerV2>(),
           achievementManager: GetIt.I<AchievementManager>(),
           title: '통계',
           accentColor: MGColors.success,
@@ -651,6 +663,15 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  String? _getBattleResult() {
+    if (widget.mode != SnakeGameMode.battle) return null;
+
+    if (_game.score == -1) return 'draw';
+    if (_game.score == -2) return 'lose';
+    if (_game.score >= 15) return 'win';
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -713,9 +734,10 @@ Navigator.of(context).pushNamed('/seasonal-event');
           // Game Over Overlay
           if (_showGameOver)
             GameOverOverlay(
-              score: _game.score,
+              score: _game.score >= 0 ? _game.score : 0,
               highScore: _highScore,
               isNewRecord: _game.isNewRecord,
+              battleResult: _getBattleResult(),
               onRestart: () {
                 _game.restart();
                 setState(() {

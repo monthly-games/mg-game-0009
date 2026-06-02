@@ -39,6 +39,49 @@ enum FoodSkin {
   const FoodSkin(this.cost, this.name, this.spriteIndex);
 }
 
+enum FoodType {
+  normal(
+    'Normal',
+    MGColors.error,
+    1,
+    null,
+  ),
+  speedBoost(
+    'Speed Boost',
+    Color(0xFF2196F3),
+    1,
+    Duration(seconds: 8),
+  ),
+  ghostMode(
+    'Ghost Mode',
+    Color(0xFF9C27B0),
+    1,
+    Duration(seconds: 5),
+  ),
+  doublePoints(
+    'Double Points',
+    Color(0xFFFFD700),
+    2,
+    Duration(seconds: 10),
+  ),
+  invincibility(
+    'Invincibility',
+    Color(0xFF00FF00),
+    1,
+    Duration(seconds: 8),
+  );
+
+  final String name;
+  final Color color;
+  final int points;
+  final Duration? duration;
+
+  const FoodType(this.name, this.color, this.points, this.duration);
+
+  bool get isSpecial => this != FoodType.normal;
+  bool get hasDuration => duration != null;
+}
+
 class SkinManager extends ChangeNotifier {
   static const String _snakeSkinKey = 'snake_skin_v1';
   static const String _foodSkinKey = 'food_skin_v1';
